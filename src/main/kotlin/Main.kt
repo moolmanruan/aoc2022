@@ -23,11 +23,11 @@ fun main(args: Array<String>) {
     run(year, day, args[2])
 }
 
-fun run(year:Int, day: Int, stage: String) {
+fun run(year: Int, day: Int, stage: String) {
     try {
         val inputFile = File("/Users/ruan/aoc2022/src/main/resources/$year/$day/$stage.txt")
 
-        if (!inputFile.exists()){
+        if (!inputFile.exists()) {
             if (stage == "problem") {
                 downloadFile(2022, day, inputFile)
             } else {
@@ -61,7 +61,7 @@ fun downloadFile(year: Int, day: Int, path: File) {
     p.waitFor(10, TimeUnit.SECONDS)
 }
 
-fun printErr(text: String){
+fun printErr(text: String) {
     println("$ANSI_RED$text$ANSI_RESET")
 }
 
