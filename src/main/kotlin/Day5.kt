@@ -17,11 +17,7 @@ fun parse(lines: List<String>): Pair<ArrayList<Stack>, ArrayList<Operation>> {
     }
 
     val numStacks = lines[splitLineIndex - 1].trim().split("""\s+""".toRegex()).size
-
-    val stacks = ArrayList<Stack>(numStacks)
-    for (i in 0 until numStacks) {
-        stacks.add(Stack())
-    }
+    val stacks = ArrayList(List(numStacks) { Stack() })
     for (i in splitLineIndex - 2 downTo 0) {
         lines[i].windowed(3, 4)
             .map { it[1] }
