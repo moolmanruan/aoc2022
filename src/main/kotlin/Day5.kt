@@ -1,3 +1,5 @@
+
+
 typealias Crate = Char
 typealias Stack = ArrayList<Crate>
 data class Operation(val count: Int, val from: Int, val to: Int)
@@ -38,11 +40,11 @@ fun day5(lines: List<String>): String {
         // Part 1
 //        for (i in 0 until op.count) {
 //            stacks[op.to].add(stacks[op.from].last())
-//            stacks[op.from].removeAt(stacks[op.from].size - 1)
+//            stacks[op.from].removeLast()
 //        }
-        val size = stacks[op.from].size
-        stacks[op.to].addAll(stacks[op.from].subList(size - op.count, size))
-        stacks[op.from] = Stack(stacks[op.from].subList(0, size - op.count))
+        // Part 2
+        stacks[op.to].addAll(stacks[op.from].takeLast(op.count))
+        stacks[op.from] = Stack(stacks[op.from].dropLast(op.count))
     }
     return stacks.fold("") { a, v -> a + v.last() }
 }
