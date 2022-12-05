@@ -28,7 +28,8 @@ fun groupItem(g: List<String>): Item {
     return g[0].find { g[1].contains(it) && g[2].contains(it) }
 }
 
-fun day3(lines: List<String>): String {
+fun day3(input: String): String {
+    val lines = input.split("\n")
     val sacks = lines.map(String::toRucksack)
     val partOne = sacks.map { it.duplicateItem().value() }.sum()
     println("Answer (part 1): $ANSI_BLUE$partOne$ANSI_RESET")

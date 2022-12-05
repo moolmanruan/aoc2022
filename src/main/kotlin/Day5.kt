@@ -9,26 +9,21 @@ fun String.toOperation(): Operation {
     return Operation(parts[0], parts[1] - 1, parts[2] - 1)
 }
 
-fun parse(lines: List<String>): Pair<List<Stack>, List<Operation>> {
-    var splitLineIndex = 0
-    for (i in lines.indices) {
-        if (lines[i].isEmpty()) {
-            splitLineIndex = i
-            break
-        }
-    }
+fun parse(input: String): Pair<List<Stack>, List<Operation>> {
+    val inputParts = input.split("\n\n")
 
-    val numStacks = lines[splitLineIndex - 1].trim().split("""\s+""".toRegex()).size
+    val stackLines = inputParts[0].split("\n").reversed()
+    val numStacks = stackLines[0].trim().split("""\s+""".toRegex()).size
     val stacks: List<Stack> = List(numStacks) { ArrayList() }
-    for (i in splitLineIndex - 2 downTo 0) {
-        lines[i].windowed(3, 4)
+    for (i in 1 until stackLines.size) {
+        stackLines[i].windowed(3, 4)
             .map { it[1] }
             .withIndex()
             .forEach { if (it.value != ' ') stacks[it.index].add(it.value) }
     }
     return Pair(
         stacks,
-        lines.subList(splitLineIndex + 1, lines.size).map { it.toOperation() }
+        inputParts[1].split("\n").map { it.toOperation() }
     )
 }
 
@@ -51,8 +46,8 @@ fun process2(stacks: List<Stack>, ops: List<Operation>): List<Stack> {
     return ss
 }
 
-fun day5(lines: List<String>): String {
-    val (stacks, ops) = parse(lines)
+fun day5(input: String): String {
+    val (stacks, ops) = parse(input)
     val ss = process2(stacks, ops)
     return ss.fold("") { a, v -> a + v.last() }
 }

@@ -35,8 +35,8 @@ fun winThrow(r: Round): Throw {
 //    }
 // }
 
-// fun day2A(lines: List<String>): String {
-//    val rounds = lines.map{it.toRound()}
+// fun day2A(input: String): String {
+//    val rounds = input.split("\n").map{it.toRound()}
 //    var score = 0
 //    for (r in rounds) {
 //        when (roundResult(r)) {
@@ -52,8 +52,8 @@ fun winThrow(r: Round): Throw {
 //    }
 //    return score.toString()
 // }
-fun day2(lines: List<String>): String {
-    val rounds = lines.map { it.toRound() }
+fun day2(input: String): String {
+    val rounds = input.split("\n").map { it.toRound() }
     var score = 0
     for (r in rounds) {
         val winScore = when (r.res) {
@@ -67,7 +67,7 @@ fun day2(lines: List<String>): String {
             Throw.PAPER -> 2
             Throw.SCISSORS -> 3
         }
-        println(throwScore)
+        score += throwScore
     }
     return score.toString()
 }

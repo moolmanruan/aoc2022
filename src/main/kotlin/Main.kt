@@ -36,15 +36,15 @@ fun run(year: Int, day: Int, stage: String) {
             }
         }
 
-        val lines = inputFile.readLines()
+        val input = inputFile.readText().trim()
 
         println("Day: ${ANSI_GREEN}$day$ANSI_RESET, Stage: ${ANSI_GREEN}$stage$ANSI_RESET")
         val answer = when (day) {
-            1 -> day1(lines)
-            2 -> day2(lines)
-            3 -> day3(lines)
-            4 -> day4(lines)
-            5 -> day5(lines)
+            1 -> day1(input)
+            2 -> day2(input)
+            3 -> day3(input)
+            4 -> day4(input)
+            5 -> day5(input)
             else -> ""
         }
         println("Answer: $ANSI_BLUE$answer$ANSI_RESET")
@@ -54,17 +54,6 @@ fun run(year: Int, day: Int, stage: String) {
 }
 
 fun downloadFile(year: Int, day: Int, path: File) {
-//    val cm = CookieManager()
-//    CookieHandler.setDefault()
-//    val client = HttpClient.newBuilder().build()
-// //    --cookie session=$ADVENT_SESSION
-//    val request = HttpRequest.newBuilder()
-//        .uri(URI.create("https://adventofcode.com/$year/day/$day/input"))
-//        .build()
-//
-//    val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-//    println(response.body())
-
     Path(path.parent).createDirectories()
     print(ANSI_PURPLE)
     println("Downloading input file for year $year day $day to $path")

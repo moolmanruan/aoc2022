@@ -21,7 +21,8 @@ fun String.toAssignment(): Assignment {
     val vals = this.split("-")
     return Assignment(vals[0].toInt(), vals[1].toInt())
 }
-fun day4(lines: List<String>): String {
+fun day4(input: String): String {
+    val lines = input.split("\n")
     val partOne = lines.map(String::toRange).count { it.fullOverlap() }.toString()
     println("Part 1: $ANSI_BLUE$partOne$ANSI_RESET")
     return lines.map(String::toRange).count { it.partialOverlap() }.toString()
