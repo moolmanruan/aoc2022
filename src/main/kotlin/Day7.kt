@@ -40,6 +40,14 @@ fun listDir(pwd: Directory, cmd: String): Directory {
     return pwd
 }
 
+fun walk(dir: Directory, fn: (Directory) -> Unit) {
+    var rest = listOf(dir)
+    while (rest.isNotEmpty()) {
+        fn(rest.first())
+        rest = rest.first().dirs + rest.drop(1)
+    }
+}
+
 const val totalAvailable = 70000000
 const val freeSpaceRequired = 30000000
 
@@ -58,11 +66,7 @@ fun day7(input: String): String {
     }
 
     val dirSizes = ArrayList<Int>()
-    fun addDirSizes(dir: Directory) {
-        dirSizes.add(dir.size())
-        dir.dirs.forEach { addDirSizes(it) }
-    }
-    addDirSizes(root)
+    walk(root) { dirSizes.add(it.size()) }
 
     println("Part one: $ANSI_BLUE${dirSizes.filter { it < 100000 }.sum()}$ANSI_RESET")
 
