@@ -2,6 +2,15 @@ package grid
 
 data class Coord(val x: Int, val y: Int)
 
+val Up = Coord(0, 1)
+val Down = Coord(0, -1)
+val Left = Coord(-1, 0)
+val Right = Coord(1, 0)
+
+fun Coord.add(other: Coord): Coord {
+    return Coord(this.x + other.x, this.y + other.y)
+}
+
 open class Grid<T>(private val data: List<List<T>>) {
     fun get(x: Int, y: Int): T {
         return this.data[y][x]
@@ -14,6 +23,10 @@ open class Grid<T>(private val data: List<List<T>>) {
     }
     fun height(): Int {
         return this.data.size
+    }
+
+    fun contains(c: Coord): Boolean {
+        return (c.y in this.data.indices && c.x in this.data[c.y].indices)
     }
 
     fun forEach(fn: (T) -> Unit) {
@@ -47,9 +60,13 @@ fun <T> NewGrid(width: Int, height: Int, default: T): Grid<T> {
     }
     return Grid(data)
 }
-fun <T> NewGridFromCSV(input: String, fn: (String) -> T): Grid<T> {
+
+// NewGridFromString creates a grid from a string input, treating each line as a row and using the `separator` to split
+// lines into cells. If the separator is empty each character will represent a cell.
+// The `fn` can be used to map the string value to the type that grid cells should contain.
+fun <T> NewGridFromString(input: String, separator: String, fn: (String) -> T): Grid<T> {
     val data = input.split("\n").map {
-        it.split(",").map(fn)
+        if (separator.isEmpty()) it.windowed(1).map(fn) else it.split(",").map(fn)
     }
     return Grid(data)
 }
