@@ -36,16 +36,22 @@ fun tailNextPos(headPos: Coord, tailPos: Coord): Coord {
 
 fun day9(input: String): String {
     val moves = input.split("\n").map(String::toMove)
-    println(moves)
 
-    var headPos = Coord(0, 0)
-    var tailPos = Coord(0, 0)
+    // Part 1
+    // val pieces = MutableList(2) { Coord(0, 0) }
+    // Part 2
+    val pieces = MutableList(10) { Coord(0, 0) }
     val visited = mutableSetOf<Coord>()
     for (move in moves) {
         for (i in 0.until(move.amount)) {
-            headPos = headPos.add(move.dir)
-            tailPos = tailNextPos(headPos, tailPos)
-            visited.add(tailPos)
+            for (pi in pieces.indices) {
+                if (pi == 0) {
+                    pieces[0] = pieces[0].add(move.dir)
+                } else {
+                    pieces[pi] = tailNextPos(pieces[pi - 1], pieces[pi])
+                }
+            }
+            visited.add(pieces.last())
         }
     }
 
