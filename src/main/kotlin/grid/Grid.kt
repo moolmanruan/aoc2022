@@ -11,6 +11,10 @@ fun Coord.add(other: Coord): Coord {
     return Coord(this.x + other.x, this.y + other.y)
 }
 
+fun Coord.copy(other: Coord): Coord {
+    return Coord(other.x, other.y)
+}
+
 open class Grid<T>(private val data: List<List<T>>) {
     fun get(x: Int, y: Int): T {
         return this.data[y][x]
