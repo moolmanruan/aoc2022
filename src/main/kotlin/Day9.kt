@@ -1,5 +1,6 @@
 import grid.*
 import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 data class Move(val dir: Coord, val amount: Int)
 
@@ -10,7 +11,6 @@ fun String.toMove(): Move {
         "D" -> Down
         "L" -> Left
         "R" -> Right
-
         else -> Coord(0, 0)
     }
     return Move(dir, parts.last().toInt())
@@ -19,19 +19,10 @@ fun String.toMove(): Move {
 fun tailNextPos(headPos: Coord, tailPos: Coord): Coord {
     val diffX = headPos.x - tailPos.x
     val diffY = headPos.y - tailPos.y
-
     if (diffX.absoluteValue <= 1 && diffY.absoluteValue <= 1) {
         return tailPos.copy()
     }
-    val moveX = if (diffX > 0) 1 else -1
-    val moveY = if (diffY > 0) 1 else -1
-    return if (diffX != 0 && diffY != 0) {
-        tailPos.add(Coord(moveX, moveY))
-    } else if (diffX == 0) {
-        tailPos.add(Coord(0, moveY))
-    } else {
-        tailPos.add(Coord(moveX, 0))
-    }
+    return tailPos.add(Coord(diffX.sign, diffY.sign))
 }
 
 fun day9(input: String): String {
@@ -55,5 +46,5 @@ fun day9(input: String): String {
         }
     }
 
-    return visited.size.toString()
+    return "${visited.size} (want 2536)"
 }
