@@ -43,7 +43,7 @@ open class Grid<T>(private val data: List<List<T>>) {
     override fun toString(): String {
         val lines = mutableListOf<String>()
         for (row in this.data) {
-            lines.add(row.joinToString(","))
+            lines.add(row.joinToString(""))
         }
         return lines.joinToString("\n")
     }
