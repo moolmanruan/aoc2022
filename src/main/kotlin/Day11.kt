@@ -4,12 +4,30 @@ data class Monkey(
     val index: Int,
     var items: MutableList<BagItem>,
     val operation: (Int) -> Int,
-    val test: (Int) -> Boolean,
-    val testVal: Int,
-    val testTrue: Int, // monkey to throw to
-    val testFalse: Int, // monkey to throw to
+    val testValue: Int,
+    val throwToTestTrue: Int, // Index of other monkey
+    val throwToTestFalse: Int, // Index of other monkey
     var numInspected: Int
 )
+
+fun Monkey.inspectItem(): BagItem {
+    val item = this.items.first()
+    this.items = this.items.drop(1).toMutableList()
+    this.numInspected++
+    return item
+}
+
+fun Monkey.clone(): Monkey {
+    return Monkey(
+        this.index,
+        this.items.map { it.clone() }.toMutableList(),
+        this.operation,
+        this.testValue,
+        this.throwToTestTrue,
+        this.throwToTestFalse,
+        this.numInspected
+    )
+}
 
 fun toMonkey(index: Int, text: String): Monkey {
     val lines = text.split("\n").map(String::trim)
@@ -19,7 +37,6 @@ fun toMonkey(index: Int, text: String): Monkey {
             .split(",").map { it.trim().toInt() }
             .map { BagItem(it, it) }.toMutableList(),
         lines[2].toOp(),
-        lines[3].toTest(),
         lines[3].split(" ").last().toInt(),
         lines[4].split(" ").last().toInt(),
         lines[5].split(" ").last().toInt(),
@@ -35,68 +52,57 @@ fun String.toOp(): (Int) -> Int {
         else -> throw Exception("unsupported operation")
     }
 }
-fun String.toTest(): (Int) -> Boolean {
-    val value = this.split("divisible by").last().trim().toInt()
-    return { v -> (v % value) == 0 }
-}
 
 data class BagItem(val init: Int, var worry: Int, val monkeys: MutableMap<Int, Int> = mutableMapOf())
 
-fun playPart1(monkeys: List<Monkey>, rounds: Int): String {
-    for (round in 0.until(rounds)) {
-        monkeys.forEachIndexed { monkeyIdx, monkey ->
-            while (monkey.items.size > 0) {
-                val item = monkey.items.first()
-                monkey.items = monkey.items.drop(1).toMutableList()
-                monkey.numInspected++
-
-                item.worry = monkey.operation(item.worry) / 3
-
-                if (item.worry % monkey.testVal == 0) {
-                    monkeys[monkey.testTrue].items.add(item)
-                } else {
-                    monkeys[monkey.testFalse].items.add(item)
-                }
-            }
-        }
-    }
-
-    var answer = BigInteger.valueOf(1)
-    for (v in monkeys.map { it.numInspected }.sorted().reversed().take(2)) {
-        val bv = BigInteger.valueOf(v.toLong())
-        answer = answer.multiply(bv)
-    }
-    return answer.toString()
+fun BagItem.clone(): BagItem {
+    return BagItem(
+        this.init,
+        this.worry,
+        this.monkeys.toMutableMap()
+    )
 }
 
-fun play(monkeys: List<Monkey>, rounds: Int): String {
+fun inspectItemPart1(monkey: Monkey, monkeys: List<Monkey>) {
+    val item = monkey.inspectItem()
+
+    item.worry = monkey.operation(item.worry) / 3
+
+    if (item.worry % monkey.testValue == 0) {
+        monkeys[monkey.throwToTestTrue].items.add(item)
+    } else {
+        monkeys[monkey.throwToTestFalse].items.add(item)
+    }
+}
+
+fun inspectItemPart2(monkey: Monkey, monkeys: List<Monkey>) {
+    val item = monkey.inspectItem()
+
+    monkeys.forEachIndexed { i, m ->
+        val newVal = monkey.operation(item.monkeys[i]!!)
+        item.monkeys[i] = newVal % m.testValue
+    }
+
+    if (item.monkeys[monkey.index] == 0) {
+        monkeys[monkey.throwToTestTrue].items.add(item)
+    } else {
+        monkeys[monkey.throwToTestFalse].items.add(item)
+    }
+}
+
+fun play(monkeys: List<Monkey>, rounds: Int, inspectFn: (monkey: Monkey, monkeys: List<Monkey>) -> Unit): String {
     for (round in 0.until(rounds)) {
-        monkeys.forEachIndexed { monkeyIdx, monkey ->
-            while (monkey.items.size > 0) {
-                val item = monkey.items.first()
-                monkey.items = monkey.items.drop(1).toMutableList()
-                monkey.numInspected++
-
-                monkeys.forEachIndexed { i, m ->
-                    val newVal = monkey.operation(item.monkeys[i]!!)
-                    item.monkeys[i] = newVal % m.testVal
-                }
-
-                if (item.monkeys[monkeyIdx] == 0) {
-                    monkeys[monkey.testTrue].items.add(item)
-                } else {
-                    monkeys[monkey.testFalse].items.add(item)
-                }
+        monkeys.forEach {
+            while (it.items.size > 0) {
+                inspectFn(it, monkeys)
             }
         }
     }
 
-    var answer = BigInteger.valueOf(1)
-    for (v in monkeys.map { it.numInspected }.sorted().reversed().take(2)) {
-        val bv = BigInteger.valueOf(v.toLong())
-        answer = answer.multiply(bv)
-    }
-    return answer.toString()
+    return monkeys.map { it.numInspected }
+        .sorted().reversed().take(2)
+        .fold(BigInteger.valueOf(1)) { a, v -> a.multiply(BigInteger.valueOf(v.toLong())) }
+        .toString()
 }
 
 fun day11(input: String): String {
@@ -106,9 +112,12 @@ fun day11(input: String): String {
     // Initialize items
     val items = monkeys.map { it.items }.fold(mutableListOf<BagItem>()) { a, v -> (a + v).toMutableList() }
     items.forEach { item ->
-        monkeys.forEachIndexed { i, m -> item.monkeys[i] = item.init % m.testVal }
+        monkeys.forEachIndexed { i, m -> item.monkeys[i] = item.init % m.testValue }
     }
 
-//    return "${playPart1(monkeys, 20)} want 113220" // Part 1
-    return "${play(monkeys, 10000)} want 30599555965" // Part 2
+    val partOne = play(monkeys.map { it.clone() }, 20, ::inspectItemPart1)
+    println("$partOne ${ANSI_WHITE}want 113220")
+
+    val partTwo = play(monkeys.map { it.clone() }, 10000, ::inspectItemPart2)
+    return "$partTwo ${ANSI_WHITE}want 30599555965"
 }
