@@ -24,22 +24,24 @@ fun Path.length(): Int {
     return positions.size
 }
 
-fun day12(input: String): String {
-    var start = Coord(0, 0)
-    var end = Coord(0, 0)
-    val heightMap = grid.NewGridFromStringIndexed(input, "") { cell, pos ->
-        when (cell) {
-            "S" -> {
-                start = pos
-                MapPos('a')
+fun Path.toString(width: Int, height: Int): String {
+    val pathGrid = grid.NewGrid(width, height, " ").toMutableGrid()
+    positions.forEachIndexed() { i: Int, c: Coord ->
+        if (i < positions.size - 1) {
+            when (positions[i + 1].sub(c)) {
+                grid.Up -> pathGrid.set(c, "v")
+                grid.Down -> pathGrid.set(c, "^")
+                grid.Right -> pathGrid.set(c, ">")
+                grid.Left -> pathGrid.set(c, "<")
             }
-            "E" -> {
-                end = pos
-                MapPos('z')
-            }
-            else -> MapPos(cell[0])
+        } else {
+            pathGrid.set(c, "X")
         }
     }
+    return pathGrid.toString()
+}
+
+fun astar(start: Coord, end: Coord, heightMap: grid.Grid<MapPos>): Path? {
     var paths = mutableListOf(
         Path(mutableListOf(start))
     )
@@ -86,27 +88,47 @@ fun day12(input: String): String {
         // sort the paths
         paths.sortBy { it.positions.size + it.pos().distanceL1(end) }
     }
+    return thePath
+}
 
-    if (thePath == null) {
-        return "Path not found"
-    }
-    val path = thePath!!
-    val pathGrid = grid.NewGrid(heightMap.width(), heightMap.height(), " ").toMutableGrid()
-    path.positions.forEachIndexed() { i: Int, c: Coord ->
-        if (i < path.positions.size - 1) {
-            when (path.positions[i + 1].sub(c)) {
-                grid.Up -> pathGrid.set(c, "v")
-                grid.Down -> pathGrid.set(c, "^")
-                grid.Right -> pathGrid.set(c, ">")
-                grid.Left -> pathGrid.set(c, "<")
+fun day12(input: String): String {
+    var startPart1 = Coord(0, 0)
+    var end = Coord(0, 0)
+    val heightMap = grid.NewGridFromStringIndexed(input, "") { cell, pos ->
+        when (cell) {
+            "S" -> {
+                startPart1 = pos
+                MapPos('a')
             }
-        } else {
-            pathGrid.set(c, "X")
+            "E" -> {
+                end = pos
+                MapPos('z')
+            }
+            else -> MapPos(cell[0])
         }
     }
 
-    println(heightMap.toStringCustom { it.letter.toString() })
-    println(pathGrid.toString())
+    val starts = mutableListOf<Coord>()
+    heightMap.forEachCell { c, value ->
+        if (value.height() == 0) {
+            starts.add(c)
+        }
+    }
 
-    return "${path.positions.size - 1} want 412 (example want 31)"
+    val bestPaths = mutableListOf<Path>()
+    starts.map { {} }
+    for (start in starts) {
+        val path = astar(start, end, heightMap) ?: continue
+        bestPaths.add(path)
+    }
+    val bestPath = bestPaths.sortedBy { it.length() }.first()
+    println(heightMap.toStringCustom { it.letter.toString() })
+
+    // Part 1
+    val partOnePath = astar(startPart1, end, heightMap)
+    println(partOnePath!!.toString(heightMap.width(), heightMap.height()))
+    println("${partOnePath.length() - 1} want 412 (example want 31)")
+    // Part 2
+    println(bestPath.toString(heightMap.width(), heightMap.height()))
+    return "${bestPath.positions.size - 1} want 402 (example want 29)"
 }
