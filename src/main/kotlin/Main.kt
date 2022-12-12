@@ -51,9 +51,10 @@ fun run(year: Int, day: Int, stage: String) {
             9 -> day9(input)
             10 -> day10(input)
             11 -> day11(input)
+            12 -> day12(input)
             else -> ""
         }
-        println("Answer: $ANSI_BLUE$answer$ANSI_RESET")
+        println(answer)
     } catch (ex: Exception) {
         printErr(ex.toString())
     }
