@@ -1,6 +1,5 @@
 import grid.Coord
 import grid.add
-import grid.distanceL1
 import grid.sub
 
 data class MapPos(val letter: Char)
@@ -41,54 +40,36 @@ fun Path.toString(width: Int, height: Int): String {
     return pathGrid.toString()
 }
 
-fun astar(start: Coord, end: Coord, heightMap: grid.Grid<MapPos>): Path? {
-    var paths = mutableListOf(
-        Path(mutableListOf(start))
-    )
-    val shortestPath = grid.NewGrid<Path?>(heightMap.width(), heightMap.width(), null).toMutableGrid()
-
-    var thePath: Path? = null
+fun aStar(start: Coord, end: Coord, heightMap: grid.Grid<MapPos>): Path? {
+    var paths = mutableListOf(Path(mutableListOf(start)))
+    val bestDistances = grid.NewGrid(heightMap.width(), heightMap.width(), Int.MAX_VALUE).toMutableGrid()
 
     while (paths.size > 0) {
         val curPath = paths.first()
         paths = paths.drop(1).toMutableList()
 
         val curPos = curPath.pos()
-        val dirs = listOf(
+        val reachableHeight = heightMap.get(curPos).height() + 1
+        listOf(
             curPos.add(grid.Up),
             curPos.add(grid.Right),
             curPos.add(grid.Down),
             curPos.add(grid.Left)
-        )
-
-        val reachableHeight = heightMap.get(curPos).height() + 1
-        dirs.forEach { dir ->
-            if (heightMap.contains(dir) &&
-                (shortestPath.get(dir) == null || shortestPath.get(dir)!!.length() > curPath.length() + 1) &&
-                (heightMap.get(dir).height() <= reachableHeight)
+        ).forEach { nextCell ->
+            if (heightMap.contains(nextCell) &&
+                (bestDistances.get(nextCell) > curPath.length() + 1) &&
+                (heightMap.get(nextCell).height() <= reachableHeight)
             ) {
-                val newPath = curPath.add(dir)
+                val newPath = curPath.add(nextCell)
                 if (newPath.pos() == end) {
-                    thePath = newPath
+                    return newPath
                 }
-
-                if (shortestPath.get(newPath.pos()) == null ||
-                    shortestPath.get(newPath.pos())!!.length() > newPath.length()
-                ) {
-                    shortestPath.set(newPath.pos(), newPath)
-                }
+                bestDistances.set(newPath.pos(), newPath.length())
                 paths.add(newPath)
             }
         }
-
-        if (thePath != null) {
-            break
-        }
-
-        // sort the paths
-        paths.sortBy { it.positions.size + it.pos().distanceL1(end) }
     }
-    return thePath
+    return null
 }
 
 fun day12(input: String): String {
@@ -116,16 +97,15 @@ fun day12(input: String): String {
     }
 
     val bestPaths = mutableListOf<Path>()
-    starts.map { {} }
     for (start in starts) {
-        val path = astar(start, end, heightMap) ?: continue
+        val path = aStar(start, end, heightMap) ?: continue
         bestPaths.add(path)
     }
     val bestPath = bestPaths.sortedBy { it.length() }.first()
     println(heightMap.toStringCustom { it.letter.toString() })
 
     // Part 1
-    val partOnePath = astar(startPart1, end, heightMap)
+    val partOnePath = aStar(startPart1, end, heightMap)
     println(partOnePath!!.toString(heightMap.width(), heightMap.height()))
     println("${partOnePath.length() - 1} want 412 (example want 31)")
     // Part 2
