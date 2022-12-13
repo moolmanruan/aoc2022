@@ -55,7 +55,7 @@ fun run(year: Int, day: Int, stage: String) {
             13 -> day13(input)
             else -> ""
         }
-        println(answer)
+        println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")
     } catch (ex: Exception) {
         printErr(ex.toString())
     }
