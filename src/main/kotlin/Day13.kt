@@ -5,11 +5,11 @@ fun String.toPair(): CodePair {
     return CodePair(parts.first(), parts.last())
 }
 
-fun parseValue(value: String): List<String> {
-    if (!value.startsWith("[")) {
+fun parseStringList(value: String): List<String> {
+    if (!(value.startsWith("[") && value.endsWith("]"))) {
         return listOf(value)
     }
-    val v = value.substring(1.until(value.length - 1))
+    val v = value.drop(1).dropLast(1)
 
     var nested = 0
     var part = ""
@@ -19,27 +19,22 @@ fun parseValue(value: String): List<String> {
             "[" -> nested++
             "]" -> nested--
         }
-        when (it) {
-            "," -> if (nested == 0) {
-                result.add(part)
-                part = ""
-            } else {
-                part += it
-            }
-            else -> part += it
+        if (it == "," && nested == 0) {
+            result.add(part)
+            part = ""
+        } else {
+            part += it
         }
     }
-    if (part.isNotEmpty()) {
-        result.add(part)
-    }
+    if (part.isNotEmpty()) result.add(part)
     return result.toList()
 }
 
 fun compareInt(a: Int, b: Int): Int {
     return when {
-        a == b -> 0
         a < b -> -1
-        else -> 1
+        a > b -> 1
+        else -> 0
     }
 }
 
@@ -47,21 +42,11 @@ fun comparePair(a: String, b: String): Int {
     val aVal = a.toIntOrNull()
     val bVal = b.toIntOrNull()
     if (aVal != null && bVal != null) {
-        return when {
-            aVal == bVal -> 0
-            aVal < bVal -> -1
-            else -> 1
-        }
+        return compareInt(aVal, bVal)
     }
 
-    val aParts = parseValue(a)
-    val bParts = parseValue(b)
-
-    if (aParts.isEmpty() && bParts.isNotEmpty()) {
-        return -1
-    } else if (aParts.isNotEmpty() && bParts.isEmpty()) {
-        return 1
-    }
+    val aParts = parseStringList(a)
+    val bParts = parseStringList(b)
 
     aParts.forEachIndexed { i, part ->
         if (i in bParts.indices) {
@@ -71,24 +56,18 @@ fun comparePair(a: String, b: String): Int {
             }
         }
     }
-    if (aParts.size < bParts.size) {
-        return -1
-    } else if (aParts.size > bParts.size) {
-        return 1
+
+    // Lists are equal so far, check sizes...
+    return when {
+        aParts.size < bParts.size -> -1
+        aParts.size > bParts.size -> 1
+        else -> 0
     }
-    return 0
 }
 
 fun checkOrder(pairs: List<CodePair>): List<Int> {
     return pairs
-        .mapIndexed { i, p ->
-            val cVal = comparePair(p.left, p.right)
-            if (cVal <= 0) {
-                i
-            } else {
-                -1
-            }
-        }
+        .mapIndexed { i, p -> if (comparePair(p.left, p.right) <= 0) i else -1 }
         .filter { it >= 0 }
 }
 
@@ -103,7 +82,7 @@ fun day13(input: String): String {
     val codes = input.replace("\n\n", "\n").split("\n").toMutableList()
     codes.add("[[2]]")
     codes.add("[[6]]")
-    val sortedCodes = codes.sortedWith { a, b -> comparePair(a, b) }
+    val sortedCodes = codes.sortedWith(::comparePair)
 
     val a = sortedCodes.indexOf("[[2]]") + 1
     val b = sortedCodes.indexOf("[[6]]") + 1
