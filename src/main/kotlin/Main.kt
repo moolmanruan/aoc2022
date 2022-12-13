@@ -52,6 +52,7 @@ fun run(year: Int, day: Int, stage: String) {
             10 -> day10(input)
             11 -> day11(input)
             12 -> day12(input)
+            13 -> day13(input)
             else -> ""
         }
         println(answer)
