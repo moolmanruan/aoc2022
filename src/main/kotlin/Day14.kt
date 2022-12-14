@@ -1,37 +1,31 @@
+import grid.Coord
 import grid.add
+import kotlin.math.sign
 
-typealias Rock = grid.Coord
-typealias Sand = grid.Coord
+typealias Rock = Coord
+typealias Sand = Coord
 
 fun stringToRocks(input: String): Set<Rock> {
     val corners = input.split(" -> ").map {
         val xy = it.split(",")
-        grid.Coord(xy.first().toInt(), xy.last().toInt())
+        Coord(xy.first().toInt(), xy.last().toInt())
     }
     val rocks = mutableSetOf<Rock>()
     for (ci in 0.until(corners.size - 1)) {
         val start = corners[ci]
         val end = corners[ci + 1]
-
-        if (start.x == end.x) {
-            val up = end.y >= start.y
-            val indices: IntRange = if (up) start.y..end.y else end.y..start.y
-            for (y in if (up) indices else indices.reversed()) {
-                rocks.add(Rock(start.x, y))
-            }
-        } else {
-            val up = end.x >= start.x
-            val indices = if (up) start.x..end.x else end.x..start.x
-            for (x in if (up) indices else indices.reversed()) {
-                rocks.add(Rock(x, start.y))
-            }
+        val step = Coord((end.x - start.x).sign, (end.y - start.y).sign)
+        var curPos = start
+        while (curPos != end) {
+            rocks.add(curPos)
+            curPos = curPos.add(step)
         }
     }
     rocks.add(corners.last())
     return rocks
 }
 
-class SandSimulation(val rocks: Set<Rock>, val sandOrigin: grid.Coord, val hasFloor: Boolean = true) {
+class SandSimulation(val rocks: Set<Rock>, val sandOrigin: Coord, val hasFloor: Boolean = true) {
     val sand = mutableSetOf<Sand>()
 
     // step adds one sand. Returns whether the sand can't be added or if it doesn't come to rest.
@@ -50,20 +44,17 @@ class SandSimulation(val rocks: Set<Rock>, val sandOrigin: grid.Coord, val hasFl
             if (!hasFloor && sandPos.y > maxY) {
                 return false
             }
-            if (sandPos.add(grid.Up) !in rocks &&
-                sandPos.add(grid.Up) !in sand
-            ) {
-                sandPos = sandPos.add(grid.Up)
-            } else if (sandPos.add(grid.UpLeft) !in rocks &&
-                sandPos.add(grid.UpLeft) !in sand
-            ) {
-                sandPos = sandPos.add(grid.UpLeft)
-            } else if (sandPos.add(grid.UpRight) !in rocks &&
-                sandPos.add(grid.UpRight) !in sand
-            ) {
-                sandPos = sandPos.add(grid.UpRight)
-            } else {
-                break
+
+            val isOpen = fun(dir: Coord): Boolean {
+                val p = sandPos.add(dir)
+                return p !in rocks && p !in sand
+            }
+
+            sandPos = when {
+                isOpen(grid.Up) -> sandPos.add(grid.Up)
+                isOpen(grid.UpLeft) -> sandPos.add(grid.UpLeft)
+                isOpen(grid.UpRight) -> sandPos.add(grid.UpRight)
+                else -> break
             }
         }
         sand.add(sandPos)
@@ -78,11 +69,11 @@ fun day14(input: String): String {
         rocks += r
     }
 
-    val simInf = SandSimulation(rocks, grid.Coord(500, 0), false)
+    val simInf = SandSimulation(rocks, Coord(500, 0), false)
     while (simInf.step()) {}
     println("Part 1:$ANSI_BLUE ${simInf.sand.size}$ANSI_WHITE want 901 example 24$ANSI_RESET")
 
-    val simFloor = SandSimulation(rocks, grid.Coord(500, 0))
+    val simFloor = SandSimulation(rocks, Coord(500, 0))
     while (simFloor.step()) {}
     return simFloor.sand.size.toString() + "$ANSI_WHITE want 24589 example 93"
 }
