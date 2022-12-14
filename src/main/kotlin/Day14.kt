@@ -1,4 +1,3 @@
-import grid.Coord
 import grid.add
 
 typealias Rock = grid.Coord
@@ -35,16 +34,19 @@ fun stringToRocks(input: String): List<Rock> {
 class SandSimulation(val rocks: List<Rock>, val sandOrigin: grid.Coord) {
     val sand = mutableListOf<Sand>()
 
-    // step adds on sand. Returns whether the sand came to a stop.
+    // step adds one sand. Returns whether the sand origin is blocked.
     fun step(): Boolean {
-        val maxY = rocks.maxBy { it.y }.y
+        if (sandOrigin in sand) {
+            return false
+        }
+
+        val maxY = rocks.maxBy { it.y }.y + 2
 
         var sandPos = sandOrigin
         while (true) {
-            if (sandPos.y > maxY) {
-                return false
-            }
-            if (sandPos.add(grid.Up) !in rocks &&
+            if (sandPos.y == maxY - 1) {
+                break
+            } else if (sandPos.add(grid.Up) !in rocks &&
                 sandPos.add(grid.Up) !in sand
             ) {
                 sandPos = sandPos.add(grid.Up)
@@ -71,7 +73,7 @@ fun day14(input: String): String {
     for (r in rocksList) {
         rocks += r
     }
-    val sim = SandSimulation(rocks, Coord(500, 0))
+    val sim = SandSimulation(rocks, grid.Coord(500, 0))
     while (sim.step()) {}
     return sim.sand.size.toString()
 }

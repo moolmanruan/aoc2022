@@ -72,11 +72,37 @@ class TestSandSimulation() {
     }
 
     @Test
-    fun infinite() {
+    fun floor() {
         val sim = SandSimulation(
             listOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
             grid.Coord(1, -5)
         )
+        assertEquals(true, sim.step())
+        assertEquals(mutableListOf(Sand(0, 3)), sim.sand)
+    }
+
+    @Test
+    fun blocked() {
+        val sim = SandSimulation(
+            listOf(Rock(100, 0)),
+            grid.Coord(1, 0)
+        )
+        assertEquals(true, sim.step())
+        val expectedSand = mutableListOf(Sand(1, 1))
+        assertEquals(expectedSand, sim.sand)
+
+        assertEquals(true, sim.step())
+        expectedSand.add(Sand(0, 1))
+        assertEquals(expectedSand, sim.sand)
+
+        assertEquals(true, sim.step())
+        expectedSand.add(Sand(2, 1))
+        assertEquals(expectedSand, sim.sand)
+
+        assertEquals(true, sim.step())
+        expectedSand.add(Sand(1, 0))
+        assertEquals(expectedSand, sim.sand)
+
         assertEquals(false, sim.step())
     }
 }
