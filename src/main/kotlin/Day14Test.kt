@@ -5,7 +5,7 @@ class TestStringsToRock() {
     @Test
     fun lineOne() {
         assertEquals(
-            listOf(
+            setOf(
                 Rock(498, 4),
                 Rock(498, 5),
                 Rock(498, 6),
@@ -19,7 +19,7 @@ class TestStringsToRock() {
     @Test
     fun lineTwo() {
         assertEquals(
-            listOf(
+            setOf(
                 Rock(503, 4),
                 Rock(502, 4),
                 Rock(502, 5),
@@ -45,7 +45,7 @@ class TestSandSimulation() {
     @Test
     fun simple() {
         val sim = SandSimulation(
-            listOf(
+            setOf(
                 Rock(-2, 5),
                 Rock(-1, 5),
                 Rock(0, 5),
@@ -55,7 +55,7 @@ class TestSandSimulation() {
             grid.Coord(0, 0)
         )
         assertEquals(true, sim.step())
-        val expectedSand = mutableListOf(Sand(0, 4))
+        val expectedSand = mutableSetOf(Sand(0, 4))
         assertEquals(expectedSand, sim.sand)
 
         assertEquals(true, sim.step())
@@ -74,7 +74,7 @@ class TestSandSimulation() {
     @Test
     fun infinite() {
         val sim = SandSimulation(
-            listOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
+            setOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
             grid.Coord(1, -5),
             false
         )
@@ -84,21 +84,21 @@ class TestSandSimulation() {
     @Test
     fun floor() {
         val sim = SandSimulation(
-            listOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
+            setOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
             grid.Coord(1, -5)
         )
         assertEquals(true, sim.step())
-        assertEquals(mutableListOf(Sand(0, 3)), sim.sand)
+        assertEquals(mutableSetOf(Sand(0, 3)), sim.sand)
     }
 
     @Test
     fun blocked() {
         val sim = SandSimulation(
-            listOf(Rock(100, 0)),
+            setOf(Rock(100, 0)),
             grid.Coord(1, 0)
         )
         assertEquals(true, sim.step())
-        val expectedSand = mutableListOf(Sand(1, 1))
+        val expectedSand = mutableSetOf(Sand(1, 1))
         assertEquals(expectedSand, sim.sand)
 
         assertEquals(true, sim.step())

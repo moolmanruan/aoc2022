@@ -3,7 +3,7 @@ import grid.add
 typealias Rock = grid.Coord
 typealias Sand = grid.Coord
 
-fun stringToRocks(input: String): List<Rock> {
+fun stringToRocks(input: String): Set<Rock> {
     val corners = input.split(" -> ").map {
         val xy = it.split(",")
         grid.Coord(xy.first().toInt(), xy.last().toInt())
@@ -28,11 +28,11 @@ fun stringToRocks(input: String): List<Rock> {
         }
     }
     rocks.add(corners.last())
-    return rocks.toList()
+    return rocks
 }
 
-class SandSimulation(val rocks: List<Rock>, val sandOrigin: grid.Coord, val hasFloor: Boolean = true) {
-    val sand = mutableListOf<Sand>()
+class SandSimulation(val rocks: Set<Rock>, val sandOrigin: grid.Coord, val hasFloor: Boolean = true) {
+    val sand = mutableSetOf<Sand>()
 
     // step adds one sand. Returns whether the sand can't be added or if it doesn't come to rest.
     fun step(): Boolean {
@@ -72,11 +72,12 @@ class SandSimulation(val rocks: List<Rock>, val sandOrigin: grid.Coord, val hasF
 }
 
 fun day14(input: String): String {
-    val rocksList = input.split("\n").map(::stringToRocks)
-    val rocks = mutableListOf<Rock>()
-    for (r in rocksList) {
+    val rocksSets = input.split("\n").map(::stringToRocks)
+    val rocks = mutableSetOf<Rock>()
+    for (r in rocksSets) {
         rocks += r
     }
+
     val simInf = SandSimulation(rocks, grid.Coord(500, 0), false)
     while (simInf.step()) {}
     println("Part 1:$ANSI_BLUE ${simInf.sand.size}$ANSI_WHITE want 901 example 24$ANSI_RESET")
