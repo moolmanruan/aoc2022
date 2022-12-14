@@ -53,6 +53,7 @@ fun run(year: Int, day: Int, stage: String) {
             11 -> day11(input)
             12 -> day12(input)
             13 -> day13(input)
+            14 -> day14(input)
             else -> ""
         }
         println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")

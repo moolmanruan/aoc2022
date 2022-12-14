@@ -7,6 +7,11 @@ val Down = Coord(0, -1)
 val Left = Coord(-1, 0)
 val Right = Coord(1, 0)
 
+val UpLeft = Coord(-1, 1)
+val UpRight = Coord(1, 1)
+val DownLeft = Coord(-1, -1)
+val DownRight = Coord(1, -1)
+
 fun Coord.add(other: Coord): Coord {
     return Coord(this.x + other.x, this.y + other.y)
 }
