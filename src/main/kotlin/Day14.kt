@@ -31,22 +31,26 @@ fun stringToRocks(input: String): List<Rock> {
     return rocks.toList()
 }
 
-class SandSimulation(val rocks: List<Rock>, val sandOrigin: grid.Coord) {
+class SandSimulation(val rocks: List<Rock>, val sandOrigin: grid.Coord, val hasFloor: Boolean = true) {
     val sand = mutableListOf<Sand>()
 
-    // step adds one sand. Returns whether the sand origin is blocked.
+    // step adds one sand. Returns whether the sand can't be added or if it doesn't come to rest.
     fun step(): Boolean {
         if (sandOrigin in sand) {
             return false
         }
 
-        val maxY = rocks.maxBy { it.y }.y + 2
+        val maxY = if (hasFloor) rocks.maxBy { it.y }.y + 2 else rocks.maxBy { it.y }.y
 
         var sandPos = sandOrigin
         while (true) {
-            if (sandPos.y == maxY - 1) {
+            if (hasFloor && sandPos.y >= maxY - 1) {
                 break
-            } else if (sandPos.add(grid.Up) !in rocks &&
+            }
+            if (!hasFloor && sandPos.y > maxY) {
+                return false
+            }
+            if (sandPos.add(grid.Up) !in rocks &&
                 sandPos.add(grid.Up) !in sand
             ) {
                 sandPos = sandPos.add(grid.Up)
@@ -73,7 +77,11 @@ fun day14(input: String): String {
     for (r in rocksList) {
         rocks += r
     }
-    val sim = SandSimulation(rocks, grid.Coord(500, 0))
-    while (sim.step()) {}
-    return sim.sand.size.toString()
+    val simInf = SandSimulation(rocks, grid.Coord(500, 0), false)
+    while (simInf.step()) {}
+    println("Part 1:$ANSI_BLUE ${simInf.sand.size}$ANSI_WHITE want 901 example 24$ANSI_RESET")
+
+    val simFloor = SandSimulation(rocks, grid.Coord(500, 0))
+    while (simFloor.step()) {}
+    return simFloor.sand.size.toString() + "$ANSI_WHITE want 24589 example 93"
 }

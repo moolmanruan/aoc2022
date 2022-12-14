@@ -72,6 +72,16 @@ class TestSandSimulation() {
     }
 
     @Test
+    fun infinite() {
+        val sim = SandSimulation(
+            listOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
+            grid.Coord(1, -5),
+            false
+        )
+        assertEquals(false, sim.step())
+    }
+
+    @Test
     fun floor() {
         val sim = SandSimulation(
             listOf(Rock(1, -1), Rock(6, 2), Rock(-13, -5)),
