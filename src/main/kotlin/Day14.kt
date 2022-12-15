@@ -25,7 +25,7 @@ fun stringToRocks(input: String): Set<Rock> {
     return rocks
 }
 
-class SandSimulation(val rocks: Set<Rock>, val sandOrigin: Coord, val hasFloor: Boolean = true) {
+class SandSimulation(private val rocks: Set<Rock>, private val sandOrigin: Coord, private val hasFloor: Boolean = true) {
     val sand = mutableSetOf<Sand>()
 
     // step adds one sand. Returns whether the sand can't be added or if it doesn't come to rest.
