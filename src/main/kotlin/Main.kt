@@ -1,3 +1,4 @@
+
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.Path
@@ -55,6 +56,7 @@ fun run(year: Int, day: Int, stage: String) {
             13 -> day13(input)
             14 -> day14(input)
             15 -> day15(input, stage)
+            151 -> day15.run(input)
             else -> ""
         }
         println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")

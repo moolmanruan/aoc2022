@@ -1,5 +1,7 @@
 package grid
 
+import kotlin.math.absoluteValue
+
 data class Coord(val x: Int, val y: Int)
 
 val Up = Coord(0, 1)
@@ -25,6 +27,9 @@ fun Coord.copy(other: Coord): Coord {
 fun Coord.distanceL1(other: Coord): Int {
     val diff = other.sub(this)
     return diff.x + diff.y
+}
+fun Coord.l1Distance(other: Coord): Int {
+    return (this.x - other.x).absoluteValue + (this.y - other.y).absoluteValue
 }
 
 open class Grid<T>(private val data: List<List<T>>) {
