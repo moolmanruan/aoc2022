@@ -17,14 +17,21 @@ class Day15Test() {
         val si = SensorInfo(Coord(0, 0), Coord(1, 1))
         assertEquals(
             listOf(
-                Coord(-2, 0),
-                Coord(2, 0),
-                Coord(-1, -1),
-                Coord(-1, 1),
-                Coord(1, -1),
-                Coord(1, 1),
-                Coord(0, -2),
-                Coord(0, 2)
+                Coord(-3, 0),
+                Coord(3, 0),
+
+                Coord(-2, -1),
+                Coord(-2, 1),
+                Coord(2, -1),
+                Coord(2, 1),
+
+                Coord(-1, -2),
+                Coord(-1, 2),
+                Coord(1, -2),
+                Coord(1, 2),
+
+                Coord(0, -3),
+                Coord(0, 3)
             ),
             si.border()
         )
@@ -35,14 +42,21 @@ class Day15Test() {
         val si = SensorInfo(Coord(1, -1), Coord(1, 1))
         assertEquals(
             listOf(
-                Coord(-1, -1),
-                Coord(3, -1),
-                Coord(0, -2),
-                Coord(0, 0),
-                Coord(2, -2),
-                Coord(2, 0),
-                Coord(1, -3),
-                Coord(1, 1)
+                Coord(-2, -1),
+                Coord(4, -1),
+
+                Coord(-1, -2),
+                Coord(-1, 0),
+                Coord(3, -2),
+                Coord(3, 0),
+
+                Coord(0, -3),
+                Coord(0, 1),
+                Coord(2, -3),
+                Coord(2, 1),
+
+                Coord(1, -4),
+                Coord(1, 2)
             ),
             si.border()
         )

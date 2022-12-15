@@ -1,5 +1,4 @@
 import grid.Coord
-import grid.add
 import grid.sub
 import java.math.BigInteger
 import kotlin.math.absoluteValue
@@ -12,7 +11,7 @@ enum class ObjectKind {
 data class SensorInfo(val pos: Coord, val beacon: Coord)
 
 fun SensorInfo.border(): List<Coord> {
-    val dist = range()
+    val dist = range() + 1
     val cc = mutableSetOf<Coord>()
     for (d in 0..dist) {
         val xd = dist - d
@@ -35,6 +34,10 @@ fun SensorInfo.range(): Int {
     return l1(pos, beacon)
 }
 
+fun SensorInfo.inRange(c: Coord): Boolean {
+    return l1(this.pos, c) <= range()
+}
+
 fun SensorInfo.reachMin(): Coord {
     return Coord(pos.x - range(), pos.y - range())
 }
@@ -53,7 +56,7 @@ fun String.toSensorInfo(): SensorInfo {
 
 fun day15(input: String, stage: String): String {
     val sensors = input.split("\n").map(String::toSensorInfo)
-//    val coverages = sensors.map(::sensorCoverage)
+
     val objMap = mutableMapOf<Coord, ObjectKind>()
     sensors.forEach {
         objMap[it.pos] = ObjectKind.SENSOR
@@ -80,8 +83,10 @@ fun day15(input: String, stage: String): String {
     println("Part 1:$ANSI_BLUE $emptyCount$ANSI_WHITE want $want1$ANSI_RESET")
 
     val maxXY = if (stage == "example")20 else 4000000
+    val startTime = System.currentTimeMillis()
     val distressBeacon = findBeacon(sensors, objMap, Coord(maxXY, maxXY))!!
-    println("Distress beacon found at $distressBeacon")
+    val endTime = System.currentTimeMillis()
+    println("Distress beacon found at $distressBeacon in ${(endTime - startTime) / 1000.0} seconds")
 
     fun toFreq(c: Coord): BigInteger {
         val xBig = BigInteger.valueOf(c.x.toLong())
@@ -95,82 +100,18 @@ fun day15(input: String, stage: String): String {
 
 fun findBeacon(sensors: List<SensorInfo>, objMap: Map<Coord, ObjectKind>, maxPos: Coord): Coord? {
     for (border in sensors.map(SensorInfo::border)) {
-        for (c in border) {
-            for (dir in listOf(grid.Up, grid.Down, grid.Left, grid.Right)) {
-                val p = c.add(dir)
-                if (p.x < 0 ||
-                    p.x > maxPos.x ||
-                    p.y < 0 ||
-                    p.y > maxPos.y ||
-                    p in objMap ||
-                    posUsed(sensors, p)
-                ) {
-                    continue
-                }
-
-                return p
-            }
+        val borderInBounds = border.filter {
+            it.x >= 0 && it.x <= maxPos.x && it.y >= 0 && it.y <= maxPos.x
+        }
+        for (c in borderInBounds) {
+            if (c !in objMap && !posUsed(sensors, c)) { return c }
         }
     }
     return null
 }
 
 fun posUsed(sensors: List<SensorInfo>, pos: Coord): Boolean {
-    for (s in sensors) {
-        if (l1(s.pos, pos) <= s.range()) {
-            return true
-        }
-    }
-    return false
-}
-
-fun findBeaconSlightlyLessBruteForce(sensors: List<SensorInfo>, objMap: Map<Coord, ObjectKind>, maxPos: Coord): Coord? {
-    var x = 0
-    for (y in 0..maxPos.y) {
-        println(y)
-        x = 0
-        while (x <= maxPos.x) {
-            val c = Coord(x, y)
-            if (c in objMap) {
-                x++
-                continue
-            }
-            var inRange = false
-            for (s in sensors) {
-                if (l1(s.pos, c) <= s.range()) {
-                    x = s.mirrorXRight(c).x + 1
-                    inRange = true
-                    break
-                }
-            }
-            if (!inRange) {
-                return c
-            }
-        }
-    }
-    return null
-}
-
-fun findBeaconBruteForce(sensors: List<SensorInfo>, objMap: Map<Coord, ObjectKind>, maxPos: Coord): Coord? {
-    for (x in 0..maxPos.x) {
-        for (y in 0..maxPos.y) {
-            val c = Coord(x, y)
-            if (c in objMap) {
-                continue
-            }
-            var inRange = false
-            for (s in sensors) {
-                if (l1(s.pos, c) <= s.range()) {
-                    inRange = true
-                    break
-                }
-            }
-            if (!inRange) {
-                return c
-            }
-        }
-    }
-    return null
+    return sensors.find { it.inRange(pos) } != null
 }
 
 fun l1(a: Coord, b: Coord): Int {
