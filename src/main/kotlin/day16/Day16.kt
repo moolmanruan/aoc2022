@@ -84,15 +84,15 @@ fun nextValve(entityIdx: Int, attempt: state, maxTicks: Int): List<state> {
         val ticksToOpen = entity.valve.moveCost[valve.pos]!! + 1
         if (ticksToOpen >= (maxTicks - entity.ticksUsed)) { continue }
 
-        val hist = attempt.history.toMutableMap()
-        hist[entity.ticksUsed + ticksToOpen] = valve.copy()
+        val hist = attempt.history.toMutableList()
+        hist.add(Pair(entity.ticksUsed + ticksToOpen, valve.copy()))
         val newEntities = attempt.entities.toMutableList()
         newEntities[entityIdx] = entity(valve, entity.ticksUsed + ticksToOpen)
         next.add(
             state(
                 newEntities.toList(),
                 availableValves.map { it.copy() }.filter { it.name != valve.name }, // drop the one we just "opened"
-                hist.toMap()
+                hist.toList()
             )
         )
     }
@@ -100,20 +100,17 @@ fun nextValve(entityIdx: Int, attempt: state, maxTicks: Int): List<state> {
 }
 
 fun nextStates(attempt: state, maxTicks: Int): List<state> {
-    return nextValve(0, attempt, maxTicks)
-
-//    return if (attempt.elephant == null) {
-//    } else {
-//        if (attempt.me.ticksUsed <= attempt.elephant.ticksUsed) {
-//            nextValve(attempt.me, attempt, maxTicks)
-//        } else {
-//            nextValve(attempt.elephant, attempt, maxTicks)
-//        }
-//    }
+    val leastTicksUsed = attempt.entities.minOf { it.ticksUsed }
+    for (i in attempt.entities.indices) {
+        if (attempt.entities[i].ticksUsed == leastTicksUsed) {
+            return nextValve(i, attempt, maxTicks)
+        }
+    }
+    throw Exception("Must have an entity that matches the smallest value")
 }
 
 data class entity(val valve: Valve, val ticksUsed: Int)
-data class state(val entities: List<entity>, val valves: List<Valve>, val history: Map<Int, Valve>)
+data class state(val entities: List<entity>, val valves: List<Valve>, val history: List<Pair<Int, Valve>>)
 
 fun state.flow(maxTicks: Int): Int {
     return history.map { (i, v) -> v.flowRate * (maxTicks - i) }.sum()
@@ -125,8 +122,8 @@ fun state.replay(maxTicks: Int): String {
     val lines = mutableListOf<String>()
     for (i in 1..maxTicks) {
         totalFlow += flowRate
-        if (i in history) {
-            flowRate += history[i]?.flowRate ?: 0
+        for (v in history.filter { it.first == i }) {
+            flowRate += v.second.flowRate
         }
         lines.add("$i: $totalFlow (+$flowRate)")
     }
@@ -136,13 +133,23 @@ fun state.replay(maxTicks: Int): String {
 fun run(input: String, stage: String): String {
     val valves = toValves(input)
 
-    val maxTicks = 30
     val startingValve = valves.find { it.name == "AA" } ?: throw Exception("Can't find valve AA")
     val activeValves = valves.filter { it.flowRate != 0 }
+
+//    val maxTicks = 30
+//    val startEntities = listOf(
+//        entity(startingValve, 0)
+//    )
+    val maxTicks = 26
+    val startEntities = listOf(
+        entity(startingValve, 0),
+        entity(startingValve, 0)
+    )
+
     val start = state(
-        listOf(entity(startingValve, 0)),
+        startEntities,
         activeValves,
-        emptyMap()
+        emptyList()
     )
 
     val attempts = mutableListOf(start)
@@ -159,7 +166,8 @@ fun run(input: String, stage: String): String {
         attempts.addAll(next)
     }
 
+//    val best = completeAttempts.sortedByDescending { it.flow(maxTicks) }.first()
+//    return "${best.flow(maxTicks)} want ${if (stage == "problem") "1460" else "1651"}"
     val best = completeAttempts.sortedByDescending { it.flow(maxTicks) }.first()
-
-    return "${best.flow(maxTicks)} want ${if (stage == "problem") "1460" else "1651"}"
+    return "${best.flow(maxTicks)} want ${if (stage == "problem") "??" else "1707"}"
 }

@@ -123,7 +123,7 @@ class Day16Test() {
         val start = state(
             listOf(entity(valves[0], 0)),
             valves,
-            mapOf()
+            emptyList()
         )
         val next = nextStates(start, maxTicks)
 
@@ -131,17 +131,17 @@ class Day16Test() {
             state(
                 listOf(entity(vAA, 1)), // just open
                 listOf(vCC, vDD),
-                mapOf(1 to vAA)
+                listOf(Pair(1, vAA))
             ),
             state(
                 listOf(entity(vCC, 2)), // tunnel + open
                 listOf(vAA, vDD),
-                mapOf(2 to vCC)
+                listOf(Pair(2, vCC))
             ),
             state(
                 listOf(entity(vDD, 3)), // 2 tunnel moves + open
                 listOf(vAA, vCC),
-                mapOf(3 to vDD)
+                listOf(Pair(3, vDD))
             )
         )
         assertEquals(want, next)
@@ -163,7 +163,7 @@ class Day16Test() {
         val start = state(
             listOf(entity(vAA, 1)),
             listOf(vDD),
-            mapOf(1 to vAA)
+            listOf(Pair(1, vAA))
         )
         val next = nextStates(start, maxTicks)
 
@@ -172,10 +172,7 @@ class Day16Test() {
                 state(
                     listOf(entity(vDD, 4)),
                     emptyList(),
-                    mapOf(
-                        1 to vAA,
-                        4 to vDD
-                    )
+                    listOf(Pair(1, vAA), Pair(4, vDD))
                 )
             ),
             next
@@ -198,109 +195,164 @@ class Day16Test() {
         val start = state(
             listOf(entity(vCC, 6)), // to get to A takes 3 moves + 1 to open it
             listOf(vAA),
-            mapOf(1 to vCC)
+            listOf(Pair(1, vCC))
         )
         assertEquals(emptyList<state>(), nextStates(start, maxTicks))
     }
 
-//    @Test
-//    fun nextSameTimeAsElephant() {
-//        val input = """
-//            Valve AA has flow rate=13; tunnels lead to valves BB, CC
-//            Valve BB has flow rate=0; tunnels lead to valve DD
-//            Valve CC has flow rate=7; tunnels lead to valve BB
-//            Valve DD has flow rate=20; tunnels lead to valve AA
-//        """.trimIndent()
-//        val valves = toValves(input)
-//        val vAA = valves[0]
-//        val vCC = valves[2]
-//        val vDD = valves[3]
-//
-//        val maxTicks = 10
-//        val elephant = entity(valves[0], 0)
-//        val start = state(entity(valves[0], 0), valves, mapOf(), elephant)
-//        val next = nextStates(start, maxTicks)
-//
-//        val want = listOf(
-//            state(
-//                entity(vAA, 1),
-//                listOf(vCC, vDD),
-//                mapOf(1 to vAA),
-//                elephant
-//            ),
-//            state(
-//                entity(vCC, 2),
-//                listOf(vAA, vCC),
-//                mapOf(2 to vCC),
-//                elephant
-//            ),
-//            state(
-//                entity(vDD, 3),
-//                listOf(vAA, vCC),
-//                mapOf(3 to vDD),
-//                elephant
-//            )
-//        )
-//        assertEquals(want, next)
-//    }
+    @Test
+    fun nextTwoEntitiesSameTime() {
+        val input = """
+            Valve AA has flow rate=13; tunnels lead to valves BB, CC
+            Valve BB has flow rate=0; tunnels lead to valve DD
+            Valve CC has flow rate=7; tunnels lead to valve BB
+            Valve DD has flow rate=20; tunnels lead to valve AA
+        """.trimIndent()
+        val valves = toValves(input)
+        val vAA = valves[0]
+        val vCC = valves[2]
+        val vDD = valves[3]
 
-//    @Test
-//    fun nextWithElephant() {
-//        val input = """
-//            Valve AA has flow rate=13; tunnels lead to valves BB, CC
-//            Valve BB has flow rate=0; tunnels lead to valve DD
-//            Valve CC has flow rate=7; tunnels lead to valve BB
-//            Valve DD has flow rate=20; tunnels lead to valve AA
-//        """.trimIndent()
-//        val valves = toValves(input)
-//        val vAA = valves[0]
-//        val vCC = valves[2]
-//        val vDD = valves[3]
-//
-//        val maxTicks = 10
-//        val start = state(entity(valves[0], 0), valves, mapOf(), entity(valves[0], 0))
-//        val next = nextStates(start, maxTicks)
-//
-//        val want = listOf(
-//            state(
-//                entity(vAA, 1), // just open
-//                listOf(vCC, vDD),
-//                mapOf(1 to vAA, 2 to vCC),
-//                entity(vCC, 2)
-//            ),
-//            state(
-//                entity(vAA, 1), // tunnel + open
-//                listOf(vAA, vDD),
-//                mapOf(1 to vAA, 3 to vDD),
-//                entity(vDD, 3)
-//            ),
-//            state(
-//                entity(vCC, 2), // 2 tunnel moves + open
-//                listOf(vAA, vCC),
-//                mapOf(1 to vAA, 2 to vCC),
-//                entity(vAA, 1)
-//            ),
-//            state(
-//                entity(vCC, 2),
-//                listOf(vAA, vCC),
-//                mapOf(2 to vCC, 3 to vDD),
-//                entity(vDD, 3)
-//            ),
-//            state(
-//                entity(vDD, 3),
-//                listOf(vAA, vCC),
-//                mapOf(1 to vAA, 3 to vDD),
-//                entity(vAA, 1)
-//            ),
-//            state(
-//                entity(vDD, 2),
-//                listOf(vAA, vCC),
-//                mapOf(2 to vCC, 3 to vDD),
-//                entity(vCC, 2)
-//            )
-//        )
-//        assertEquals(want, next)
-//    }
+        val maxTicks = 10
+        val elephant = entity(valves[0], 0)
+        val start = state(
+            listOf(
+                entity(valves[0], 0),
+                elephant
+            ),
+            valves,
+            emptyList()
+        )
+        val next = nextStates(start, maxTicks)
+
+        val want = listOf(
+            state(
+                listOf(
+                    entity(vAA, 1),
+                    elephant
+                ),
+                listOf(vCC, vDD),
+                listOf(Pair(1, vAA))
+            ),
+            state(
+                listOf(
+                    entity(vCC, 2),
+                    elephant
+                ),
+                listOf(vAA, vDD),
+                listOf(Pair(2, vCC))
+            ),
+            state(
+                listOf(
+                    entity(vDD, 3),
+                    elephant
+                ),
+                listOf(vAA, vCC),
+                listOf(Pair(3, vDD))
+            )
+        )
+        assertEquals(want, next)
+    }
+
+    @Test
+    fun nextWithElephantFirst() {
+        val input = """
+            Valve AA has flow rate=13; tunnels lead to valves BB, CC
+            Valve BB has flow rate=0; tunnels lead to valve DD
+            Valve CC has flow rate=7; tunnels lead to valve BB
+            Valve DD has flow rate=20; tunnels lead to valve AA
+        """.trimIndent()
+        val valves = toValves(input)
+        val vAA = valves[0]
+        val vCC = valves[2]
+        val vDD = valves[3]
+
+        val maxTicks = 10
+        val me = entity(valves[0], 1)
+        val start = state(
+            listOf(
+                me,
+                entity(valves[0], 0)
+            ),
+            valves,
+            emptyList()
+        )
+        val next = nextStates(start, maxTicks)
+
+        val want = listOf(
+            state(
+                listOf(
+                    me,
+                    entity(vAA, 1)
+                ),
+                listOf(vCC, vDD),
+                listOf(Pair(1, vAA))
+            ),
+            state(
+                listOf(
+                    me,
+                    entity(vCC, 2)
+                ),
+                listOf(vAA, vDD),
+                listOf(Pair(2, vCC))
+            ),
+            state(
+                listOf(
+                    me,
+                    entity(vDD, 3)
+                ),
+                listOf(vAA, vCC),
+                listOf(Pair(3, vDD))
+            )
+        )
+        assertEquals(want, next)
+    }
+
+    @Test
+    fun nextTogether() {
+        val input = """
+            Valve AA has flow rate=13; tunnels lead to valves BB, CC
+            Valve BB has flow rate=0; tunnels lead to valve DD
+            Valve CC has flow rate=7; tunnels lead to valve BB
+            Valve DD has flow rate=20; tunnels lead to valve AA
+        """.trimIndent()
+        val valves = toValves(input)
+        val vAA = valves[0]
+        val vCC = valves[2]
+        val vDD = valves[3]
+
+        val maxTicks = 10
+        val start = state(
+            listOf(
+                entity(vAA, 1),
+                entity(vAA, 0)
+            ),
+            listOf(vCC, vDD),
+            listOf(Pair(1, vAA))
+        )
+        val next = nextStates(start, maxTicks)
+
+        val want = listOf(
+            state(
+                listOf(
+                    entity(vAA, 1),
+                    entity(vCC, 2)
+                ),
+                listOf(vDD),
+                listOf(Pair(1, vAA), Pair(2, vCC))
+            ),
+            state(
+                listOf(
+                    entity(vAA, 1),
+                    entity(vDD, 3)
+                ),
+                listOf(vCC),
+                listOf(Pair(1, vAA), Pair(3, vDD))
+            )
+        )
+
+        assertEquals(want, next)
+    }
 
     @Test
     fun history() {
@@ -319,11 +371,7 @@ class Day16Test() {
         val s = state(
             listOf(entity(vCC, maxTicks)),
             emptyList(),
-            mapOf(
-                3 to vDD,
-                5 to vAA,
-                7 to vCC
-            )
+            listOf(Pair(3, vDD), Pair(5, vAA), Pair(7, vCC))
         )
 
         assertEquals(226, s.flow(maxTicks))
