@@ -1,13 +1,13 @@
-import grid.add
+import grid.plus
 
 fun visible(g: grid.Grid<Int>, c: grid.Coord, dir: grid.Coord): Boolean {
     val v = g.get(c.x, c.y)
-    var other = c.add(dir)
+    var other = c + dir
     while (g.contains(other)) {
         if (g.get(other.x, other.y) >= v) {
             return false
         }
-        other = other.add(dir)
+        other += dir
     }
     return true
 }
@@ -15,13 +15,13 @@ fun visible(g: grid.Grid<Int>, c: grid.Coord, dir: grid.Coord): Boolean {
 fun numVisible(g: grid.Grid<Int>, c: grid.Coord, dir: grid.Coord): Int {
     var count = 0
     val v = g.get(c.x, c.y)
-    var other = c.add(dir)
+    var other = c + dir
     while (g.contains(other)) {
         count++
         if (g.get(other.x, other.y) >= v) {
             return count
         }
-        other = other.add(dir)
+        other += dir
     }
     return count
 }

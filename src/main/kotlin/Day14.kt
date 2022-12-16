@@ -1,5 +1,5 @@
 import grid.Coord
-import grid.add
+import grid.plus
 import kotlin.math.sign
 
 typealias Rock = Coord
@@ -18,7 +18,7 @@ fun stringToRocks(input: String): Set<Rock> {
         var curPos = start
         while (curPos != end) {
             rocks.add(curPos)
-            curPos = curPos.add(step)
+            curPos += step
         }
     }
     rocks.add(corners.last())
@@ -46,14 +46,14 @@ class SandSimulation(private val rocks: Set<Rock>, private val sandOrigin: Coord
             }
 
             val isOpen = fun(dir: Coord): Boolean {
-                val p = sandPos.add(dir)
+                val p = sandPos + dir
                 return p !in rocks && p !in sand
             }
 
             sandPos = when {
-                isOpen(grid.Up) -> sandPos.add(grid.Up)
-                isOpen(grid.UpLeft) -> sandPos.add(grid.UpLeft)
-                isOpen(grid.UpRight) -> sandPos.add(grid.UpRight)
+                isOpen(grid.Up) -> sandPos + grid.Up
+                isOpen(grid.UpLeft) -> sandPos + grid.UpLeft
+                isOpen(grid.UpRight) -> sandPos + grid.UpRight
                 else -> break
             }
         }

@@ -14,10 +14,10 @@ val UpRight = Coord(1, 1)
 val DownLeft = Coord(-1, -1)
 val DownRight = Coord(1, -1)
 
-fun Coord.add(other: Coord): Coord {
+operator fun Coord.plus(other: Coord): Coord {
     return Coord(this.x + other.x, this.y + other.y)
 }
-fun Coord.sub(other: Coord): Coord {
+operator fun Coord.minus(other: Coord): Coord {
     return Coord(this.x - other.x, this.y - other.y)
 }
 
@@ -25,7 +25,7 @@ fun Coord.copy(other: Coord): Coord {
     return Coord(other.x, other.y)
 }
 fun Coord.distanceL1(other: Coord): Int {
-    val diff = other.sub(this)
+    val diff = other - this
     return diff.x + diff.y
 }
 fun Coord.l1Distance(other: Coord): Int {

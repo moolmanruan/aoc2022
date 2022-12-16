@@ -1,6 +1,6 @@
 import grid.Coord
-import grid.add
-import grid.sub
+import grid.minus
+import grid.plus
 
 data class MapPos(val letter: Char)
 
@@ -27,7 +27,7 @@ fun Path.toString(width: Int, height: Int): String {
     val pathGrid = grid.NewGrid(width, height, " ").toMutableGrid()
     positions.forEachIndexed() { i: Int, c: Coord ->
         if (i < positions.size - 1) {
-            when (positions[i + 1].sub(c)) {
+            when (positions[i + 1] - c) {
                 grid.Up -> pathGrid.set(c, "v")
                 grid.Down -> pathGrid.set(c, "^")
                 grid.Right -> pathGrid.set(c, ">")
@@ -51,10 +51,10 @@ fun aStar(start: Coord, end: Coord, heightMap: grid.Grid<MapPos>): Path? {
         val curPos = curPath.pos()
         val reachableHeight = heightMap.get(curPos).height() + 1
         listOf(
-            curPos.add(grid.Up),
-            curPos.add(grid.Right),
-            curPos.add(grid.Down),
-            curPos.add(grid.Left)
+            curPos + grid.Up,
+            curPos + grid.Right,
+            curPos + grid.Down,
+            curPos + grid.Left
         ).forEach { nextCell ->
             if (heightMap.contains(nextCell) &&
                 (bestDistances.get(nextCell) > curPath.length() + 1) &&

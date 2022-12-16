@@ -1,5 +1,5 @@
 import grid.Coord
-import grid.sub
+import grid.minus
 import java.math.BigInteger
 import kotlin.math.absoluteValue
 
@@ -115,6 +115,6 @@ fun posUsed(sensors: List<SensorInfo>, pos: Coord): Boolean {
 }
 
 fun l1(a: Coord, b: Coord): Int {
-    val d = b.sub(a)
+    val d = b - a
     return d.x.absoluteValue + d.y.absoluteValue
 }

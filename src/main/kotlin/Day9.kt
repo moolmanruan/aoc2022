@@ -22,7 +22,7 @@ fun tailNextPos(headPos: Coord, tailPos: Coord): Coord {
     if (diffX.absoluteValue <= 1 && diffY.absoluteValue <= 1) {
         return tailPos.copy()
     }
-    return tailPos.add(Coord(diffX.sign, diffY.sign))
+    return tailPos + Coord(diffX.sign, diffY.sign)
 }
 
 fun day9(input: String): String {
@@ -37,7 +37,7 @@ fun day9(input: String): String {
         for (i in 0.until(move.amount)) {
             for (pi in pieces.indices) {
                 if (pi == 0) {
-                    pieces[0] = pieces[0].add(move.dir)
+                    pieces[0] += move.dir
                 } else {
                     pieces[pi] = tailNextPos(pieces[pi - 1], pieces[pi])
                 }
