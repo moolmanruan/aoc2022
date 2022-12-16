@@ -82,7 +82,21 @@ fun nextValve(entityIdx: Int, attempt: state, maxTicks: Int): List<state> {
     for (valve in availableValves) {
         // ignore valves we can reach in time
         val ticksToOpen = entity.valve.moveCost[valve.pos]!! + 1
-        if (ticksToOpen >= (maxTicks - entity.ticksUsed)) { continue }
+        if (ticksToOpen >= (maxTicks - entity.ticksUsed)) {
+            if (attempt.entities.size > 1) {
+                // Remove entity that's out of time
+                val newEntities = attempt.entities.toMutableList()
+                newEntities.removeAt(entityIdx)
+                next.add(
+                    state(
+                        newEntities.toList(),
+                        availableValves.map { it.copy() },
+                        attempt.history.toMutableList().toList()
+                    )
+                )
+            }
+            continue
+        }
 
         val hist = attempt.history.toMutableList()
         hist.add(Pair(entity.ticksUsed + ticksToOpen, valve.copy()))
@@ -131,15 +145,18 @@ fun state.replay(maxTicks: Int): String {
 }
 
 fun run(input: String, stage: String): String {
+    val startTime = System.currentTimeMillis()
     val valves = toValves(input)
 
     val startingValve = valves.find { it.name == "AA" } ?: throw Exception("Can't find valve AA")
     val activeValves = valves.filter { it.flowRate != 0 }
 
-//    val maxTicks = 30
-//    val startEntities = listOf(
-//        entity(startingValve, 0)
-//    )
+    // Part 1
+    // val maxTicks = 30
+    // val startEntities = listOf(
+    //    entity(startingValve, 0)
+    // )
+    // Part 2
     val maxTicks = 26
     val startEntities = listOf(
         entity(startingValve, 0),
@@ -153,7 +170,7 @@ fun run(input: String, stage: String): String {
     )
 
     val attempts = mutableListOf(start)
-    val completeAttempts = mutableListOf<state>()
+    var best: Int = Int.MIN_VALUE
     while (attempts.isNotEmpty()) {
         // Take the best on so far
         attempts.sortByDescending { it.flow(maxTicks) }
@@ -161,13 +178,18 @@ fun run(input: String, stage: String): String {
         val current = attempts.removeFirst()
         val next = nextStates(current, maxTicks)
         if (next.isEmpty()) {
-            completeAttempts.add(current)
+            val answer = current.flow(maxTicks)
+            if (answer > best) {
+                println("> $answer (${System.currentTimeMillis() - startTime}ms)")
+                best = answer
+            }
         }
         attempts.addAll(next)
     }
+    println("Time taken ${System.currentTimeMillis() - startTime}ms")
 
-//    val best = completeAttempts.sortedByDescending { it.flow(maxTicks) }.first()
-//    return "${best.flow(maxTicks)} want ${if (stage == "problem") "1460" else "1651"}"
-    val best = completeAttempts.sortedByDescending { it.flow(maxTicks) }.first()
-    return "${best.flow(maxTicks)} want ${if (stage == "problem") "??" else "1707"}"
+    // Part 1
+    // return "$best want ${if (stage == "problem") "1460" else "1651"}"
+    // Part 2
+    return "$best want ${if (stage == "problem") "2117" else "1707"}"
 }

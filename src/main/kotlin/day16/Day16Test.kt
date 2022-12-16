@@ -355,6 +355,40 @@ class Day16Test() {
     }
 
     @Test
+    fun nextOutOfTimeMultipleEntities() {
+        val input = """
+            Valve AA has flow rate=13; tunnels lead to valves BB, CC
+            Valve BB has flow rate=0; tunnels lead to valve DD
+            Valve CC has flow rate=7; tunnels lead to valve BB
+            Valve DD has flow rate=20; tunnels lead to valve AA
+        """.trimIndent()
+        val valves = toValves(input)
+        val vAA = valves[0]
+        val vCC = valves[2]
+        val vDD = valves[3]
+
+        val maxTicks = 10
+        val start = state(
+            listOf(
+                entity(vCC, 6),
+                entity(vAA, 9)
+            ), // to get to A takes 3 moves + 1 to open it
+            listOf(vAA),
+            listOf(Pair(1, vCC), Pair(1, vDD))
+        )
+        val want = listOf(
+            state(
+                listOf(entity(vAA, 9)),
+                listOf(vAA),
+                listOf(Pair(1, vCC), Pair(1, vDD))
+            )
+        )
+        val next = nextStates(start, maxTicks)
+        assertEquals(want, next)
+        assertEquals(emptyList<state>(), nextStates(next[0], maxTicks))
+    }
+
+    @Test
     fun history() {
         val input = """
             Valve AA has flow rate=13; tunnels lead to valves BB, CC
@@ -387,6 +421,44 @@ class Day16Test() {
             8: 146 (+40)
             9: 186 (+40)
             10: 226 (+40)
+            """.trimIndent(),
+            s.replay(maxTicks)
+        )
+    }
+
+    @Test
+    fun historySimultaneous() {
+        val input = """
+            Valve AA has flow rate=13; tunnels lead to valves BB, CC
+            Valve BB has flow rate=0; tunnels lead to valve DD
+            Valve CC has flow rate=7; tunnels lead to valve BB
+            Valve DD has flow rate=20; tunnels lead to valve AA
+        """.trimIndent()
+        val valves = toValves(input)
+        val vAA = valves[0]
+        val vCC = valves[2]
+        val vDD = valves[3]
+
+        val maxTicks = 10
+        val s = state(
+            listOf(entity(vCC, maxTicks)),
+            emptyList(),
+            listOf(Pair(2, vDD), Pair(5, vAA), Pair(5, vCC))
+        )
+
+        assertEquals(260, s.flow(maxTicks))
+        assertEquals(
+            """
+            1: 0 (+0)
+            2: 0 (+20)
+            3: 20 (+20)
+            4: 40 (+20)
+            5: 60 (+40)
+            6: 100 (+40)
+            7: 140 (+40)
+            8: 180 (+40)
+            9: 220 (+40)
+            10: 260 (+40)
             """.trimIndent(),
             s.replay(maxTicks)
         )
