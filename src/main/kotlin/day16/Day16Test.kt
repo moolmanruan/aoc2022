@@ -120,25 +120,22 @@ class Day16Test() {
         val vDD = valves[3]
 
         val maxTicks = 10
-        val start = state(valves[0], 0, valves, mapOf())
+        val start = state(entity(valves[0], 0), valves, mapOf())
         val next = nextStates(start, maxTicks)
 
         val want = listOf(
             state(
-                vAA,
-                1, // just open
+                entity(vAA, 1), // just open
                 listOf(vCC, vDD),
                 mapOf(1 to vAA)
             ),
             state(
-                vCC,
-                2, // tunnel + open
+                entity(vCC, 2), // tunnel + open
                 listOf(vAA, vDD),
                 mapOf(2 to vCC)
             ),
             state(
-                vDD,
-                3, // 2 tunnel moves + open
+                entity(vDD, 3), // 2 tunnel moves + open
                 listOf(vAA, vCC),
                 mapOf(3 to vDD)
             )
@@ -160,8 +157,7 @@ class Day16Test() {
 
         val maxTicks = 10
         val start = state(
-            vAA,
-            1,
+            entity(vAA, 1),
             listOf(vDD),
             mapOf(1 to vAA)
         )
@@ -170,8 +166,7 @@ class Day16Test() {
         assertEquals(
             listOf(
                 state(
-                    vDD,
-                    4,
+                    entity(vDD, 4),
                     emptyList(),
                     mapOf(
                         1 to vAA,
@@ -197,8 +192,7 @@ class Day16Test() {
 
         val maxTicks = 10
         val start = state(
-            vCC,
-            6, // to get to A takes 3 moves + 1 to open it
+            entity(vCC, 6), // to get to A takes 3 moves + 1 to open it
 //            1234,
             listOf(vAA),
             mapOf(1 to vCC)
@@ -221,11 +215,7 @@ class Day16Test() {
 
         val maxTicks = 10
         val s = state(
-            vCC,
-            maxTicks,
-//            vDD.flowRate * (maxTicks - 3) +
-//                vAA.flowRate * (maxTicks - 5) +
-//                vCC.flowRate * (maxTicks - 7),
+            entity(vCC, maxTicks),
             emptyList(),
             mapOf(
                 3 to vDD,

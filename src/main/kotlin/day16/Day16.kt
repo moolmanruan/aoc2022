@@ -80,15 +80,14 @@ fun nextStates(attempt: state, maxTicks: Int): List<state> {
     val nextValves = attempt.valves.filter { it.flowRate != 0 }
     for (valve in nextValves) {
         // ignore valves we can reach in time
-        val ticksToOpen = attempt.valve.moveCost[valve.pos]!! + 1
-        if (ticksToOpen >= (maxTicks - attempt.ticksUsed)) { continue }
+        val ticksToOpen = attempt.me.valve.moveCost[valve.pos]!! + 1
+        if (ticksToOpen >= (maxTicks - attempt.me.ticksUsed)) { continue }
 
         val hist = attempt.history.toMutableMap()
-        hist[attempt.ticksUsed + ticksToOpen] = valve.copy()
+        hist[attempt.me.ticksUsed + ticksToOpen] = valve.copy()
         next.add(
             state(
-                valve,
-                attempt.ticksUsed + ticksToOpen,
+                entity(valve, attempt.me.ticksUsed + ticksToOpen),
                 nextValves.map { it.copy() }.filter { it.name != valve.name }, // drop the one we just "opened"
                 hist.toMap()
             )
@@ -97,7 +96,8 @@ fun nextStates(attempt: state, maxTicks: Int): List<state> {
     return next
 }
 
-data class state(val valve: Valve, val ticksUsed: Int, val valves: List<Valve>, val history: Map<Int, Valve>)
+data class entity(val valve: Valve, val ticksUsed: Int)
+data class state(val me: entity, val valves: List<Valve>, val history: Map<Int, Valve>)
 
 fun state.flow(maxTicks: Int): Int {
     return history.map { (i, v) -> v.flowRate * (maxTicks - i) }.sum()
@@ -117,15 +117,14 @@ fun state.replay(maxTicks: Int): String {
     return lines.joinToString("\n")
 }
 
-fun run(input: String): String {
+fun run(input: String, stage: String): String {
     val valves = toValves(input)
 
     val maxTicks = 30
     val startingValve = valves.find { it.name == "AA" } ?: throw Exception("Can't find valve AA")
     val activeValves = valves.filter { it.flowRate != 0 }
     val start = state(
-        startingValve,
-        0,
+        entity(startingValve, 0),
         activeValves,
         emptyMap()
     )
@@ -145,5 +144,6 @@ fun run(input: String): String {
     }
 
     val best = completeAttempts.sortedByDescending { it.flow(maxTicks) }.first()
-    return "${best.flow(maxTicks)} want 1460 example 1651"
+
+    return "${best.flow(maxTicks)} want ${if (stage == "problem") "1460" else "1651"}"
 }
