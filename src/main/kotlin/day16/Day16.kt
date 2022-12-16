@@ -192,4 +192,6 @@ fun run(input: String, stage: String): String {
     // return "$best want ${if (stage == "problem") "1460" else "1651"}"
     // Part 2
     return "$best want ${if (stage == "problem") "2117" else "1707"}"
+
+    // problem alt 1724 part 1
 }
