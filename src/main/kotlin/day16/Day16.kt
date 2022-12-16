@@ -75,20 +75,23 @@ fun toValves(input: String): List<Valve> {
     return valves
 }
 
-fun nextStates(attempt: state, maxTicks: Int): List<state> {
+fun nextValve(entityIdx: Int, attempt: state, maxTicks: Int): List<state> {
+    val entity = attempt.entities[entityIdx]
     val next = mutableListOf<state>()
-    val nextValves = attempt.valves.filter { it.flowRate != 0 }
-    for (valve in nextValves) {
+    val availableValves = attempt.valves.filter { it.flowRate != 0 }
+    for (valve in availableValves) {
         // ignore valves we can reach in time
-        val ticksToOpen = attempt.me.valve.moveCost[valve.pos]!! + 1
-        if (ticksToOpen >= (maxTicks - attempt.me.ticksUsed)) { continue }
+        val ticksToOpen = entity.valve.moveCost[valve.pos]!! + 1
+        if (ticksToOpen >= (maxTicks - entity.ticksUsed)) { continue }
 
         val hist = attempt.history.toMutableMap()
-        hist[attempt.me.ticksUsed + ticksToOpen] = valve.copy()
+        hist[entity.ticksUsed + ticksToOpen] = valve.copy()
+        val newEntities = attempt.entities.toMutableList()
+        newEntities[entityIdx] = entity(valve, entity.ticksUsed + ticksToOpen)
         next.add(
             state(
-                entity(valve, attempt.me.ticksUsed + ticksToOpen),
-                nextValves.map { it.copy() }.filter { it.name != valve.name }, // drop the one we just "opened"
+                newEntities.toList(),
+                availableValves.map { it.copy() }.filter { it.name != valve.name }, // drop the one we just "opened"
                 hist.toMap()
             )
         )
@@ -96,8 +99,21 @@ fun nextStates(attempt: state, maxTicks: Int): List<state> {
     return next
 }
 
+fun nextStates(attempt: state, maxTicks: Int): List<state> {
+    return nextValve(0, attempt, maxTicks)
+
+//    return if (attempt.elephant == null) {
+//    } else {
+//        if (attempt.me.ticksUsed <= attempt.elephant.ticksUsed) {
+//            nextValve(attempt.me, attempt, maxTicks)
+//        } else {
+//            nextValve(attempt.elephant, attempt, maxTicks)
+//        }
+//    }
+}
+
 data class entity(val valve: Valve, val ticksUsed: Int)
-data class state(val me: entity, val valves: List<Valve>, val history: Map<Int, Valve>)
+data class state(val entities: List<entity>, val valves: List<Valve>, val history: Map<Int, Valve>)
 
 fun state.flow(maxTicks: Int): Int {
     return history.map { (i, v) -> v.flowRate * (maxTicks - i) }.sum()
@@ -124,7 +140,7 @@ fun run(input: String, stage: String): String {
     val startingValve = valves.find { it.name == "AA" } ?: throw Exception("Can't find valve AA")
     val activeValves = valves.filter { it.flowRate != 0 }
     val start = state(
-        entity(startingValve, 0),
+        listOf(entity(startingValve, 0)),
         activeValves,
         emptyMap()
     )
