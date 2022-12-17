@@ -59,6 +59,7 @@ fun run(year: Int, day: Int, stage: String) {
             151 -> day15.run(input)
             16 -> day16.run(input, stage)
             17 -> day17.run(input, stage)
+            18 -> day18.run(input, stage)
             else -> ""
         }
         if (answer.isNotEmpty()) println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")
