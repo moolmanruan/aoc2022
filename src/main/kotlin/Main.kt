@@ -61,7 +61,7 @@ fun run(year: Int, day: Int, stage: String) {
             17 -> day17.run(input, stage)
             else -> ""
         }
-        println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")
+        if (answer.isNotEmpty()) println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")
     } catch (ex: Exception) {
         printErr(ex.toString())
     }

@@ -2,6 +2,7 @@ package day17
 
 import grid.Coord
 import grid.plus
+import output.printAnswer
 
 typealias Rock = Set<Coord>
 
@@ -19,89 +20,90 @@ fun Rock.moveBy(c: Coord): Rock {
 }
 
 val ROCKS = listOf(
-//####
+// ####
     setOf(
-        Coord(0,0),
-        Coord(1,0),
-        Coord(2,0),
-        Coord(3,0)
+        Coord(0, 0),
+        Coord(1, 0),
+        Coord(2, 0),
+        Coord(3, 0)
     ),
-//.#.
-//###
-//.#.
+// .#.
+// ###
+// .#.
     setOf(
-        Coord(1,0),
-        Coord(0,1),
-        Coord(1,1),
-        Coord(2,1),
-        Coord(1,2)
+        Coord(1, 0),
+        Coord(0, 1),
+        Coord(1, 1),
+        Coord(2, 1),
+        Coord(1, 2)
     ),
-//..#
-//..#
-//###
+// ..#
+// ..#
+// ###
     setOf(
-        Coord(0,0),
-        Coord(1,0),
-        Coord(2,0),
-        Coord(2,1),
-        Coord(2,2)
+        Coord(0, 0),
+        Coord(1, 0),
+        Coord(2, 0),
+        Coord(2, 1),
+        Coord(2, 2)
     ),
-//#
-//#
-//#
-//#
+// #
+// #
+// #
+// #
     setOf(
         Coord(0, 0),
         Coord(0, 1),
         Coord(0, 2),
         Coord(0, 3)
     ),
-//##
-//##
+// ##
+// ##
     setOf(
         Coord(0, 0),
         Coord(1, 0),
         Coord(0, 1),
         Coord(1, 1)
-    ),
+    )
 )
 
 const val CHAMBER_WIDTH = 7
 const val BEGIN_X = 2
 const val BEGIN_Y = 3
 
-const val EXAMPLE_ROCKS = 2022
-const val EXAMPLE_HEIGHT = 3068
+const val PART1_ROCKS = 2022
+const val PART2_ROCKS = 1000000000000
+const val PART1_EXAMPLE_ANSWER = 3068
+const val PART1_PROBLEM_ANSWER = 3191
+const val PART2_EXAMPLE_ANSWER = 1514285714288
+const val PART2_PROBLEM_ANSWER = 1572093023267
 
-enum class Move {LEFT, RIGHT, DOWN}
+enum class Move { LEFT, RIGHT, DOWN }
 
 data class simulation(val width: Int, val rocks: List<Rock>, val pushes: List<Move>) {
-    val stopped = mutableSetOf<Coord>()
-    var active: Rock? = null
-    var activeIndex = -1
-    var pushIndex = -1
-
+    private val stopped = mutableSetOf<Coord>()
+    private var active: Rock? = null
+    private var activeIndex = -1
+    private var pushIndex = -1
     var numRocks = 0
-    var ticks = 0
 
     fun tick() {
-        ticks++
-        println("Tick #$ticks")
-
         maybeNewRock()
-        if (!push()) {println("BLOCKED")}
-        if (!fall()) {
-            stopActive()
+        while (active != null) {
+            push()
+            if (!fall()) {
+                stopActive()
+            }
         }
     }
 
-    fun nextPush():Move {
-        pushIndex = (pushIndex+1)%pushes.size
+    fun nextPush(): Move {
+        pushIndex = (pushIndex + 1) % pushes.size
         return pushes[pushIndex]
     }
-    fun push():Boolean {
+
+    fun push(): Boolean {
         val p = nextPush()
-        println("PUSH $p")
         val pushedActive = active?.move(p) ?: error("No rock to push")
 
         // Can't push past wall
@@ -120,7 +122,6 @@ data class simulation(val width: Int, val rocks: List<Rock>, val pushes: List<Mo
     }
 
     fun fall(): Boolean {
-        println("FALL")
         val fallActive = active?.move(Move.DOWN) ?: error("No rock to fall")
         // Can't fall past the floor
         for (piece in fallActive) {
@@ -137,25 +138,24 @@ data class simulation(val width: Int, val rocks: List<Rock>, val pushes: List<Mo
     }
 
     fun nextRock(): Rock {
-        activeIndex = (activeIndex+1)%rocks.size
+        activeIndex = (activeIndex + 1) % rocks.size
         return rocks[activeIndex]
     }
+
     fun maybeNewRock() {
         if (active == null) {
-            active = nextRock().moveBy(Coord(BEGIN_X,height()+ BEGIN_Y))
-            println("NEW ROCK $activeIndex $active")
+            active = nextRock().moveBy(Coord(BEGIN_X, height() + BEGIN_Y))
         }
     }
 
     fun stopActive() {
-        println("STOPPED AT $active")
-        active?.forEach {stopped.add(it)}
+        active!!.forEach { stopped.add(it) }
         active = null
         numRocks++
     }
 
-    fun height():Int {
-        return if (stopped.isEmpty()) 0 else stopped.maxOf { it.y }+1
+    fun height(): Int {
+        return if (stopped.isEmpty()) 0 else stopped.maxOf { it.y } + 1
     }
 }
 
@@ -170,12 +170,82 @@ fun String.toPushes(): List<Move> {
 }
 
 fun run(input: String, stage: String): String {
-    val sim = simulation(CHAMBER_WIDTH, ROCKS, input.toPushes())
+    part1(input, stage)
+    part2(input, stage)
+    return ""
+}
 
-    while (sim.numRocks < EXAMPLE_ROCKS) {
-//    while (sim.numRocks < 3) {
-//    for (s in 1 ..5){
+fun part1(input: String, stage: String) {
+    val sim = simulation(CHAMBER_WIDTH, ROCKS, input.toPushes())
+    while (sim.numRocks < PART1_ROCKS) { sim.tick() }
+    val want = if (stage == "problem") PART1_PROBLEM_ANSWER else PART1_EXAMPLE_ANSWER
+    printAnswer(sim.height(), want, "Part 1")
+}
+
+fun part2(input: String, stage: String) {
+    val sim = simulation(CHAMBER_WIDTH, ROCKS, input.toPushes())
+    var pattern: Pattern? = null
+    while (sim.numRocks < PART2_ROCKS) {
         sim.tick()
+        pattern = findRepeatingPattern(sim)
+        if (pattern != null) {
+            break
+        }
     }
-    return "${sim.height()} want $EXAMPLE_HEIGHT"
+
+    pattern = pattern!!
+    val rocksBeforePattern = pattern.startValues.size.toLong()
+    val rocksInPattern = pattern.values.size.toLong()
+    val repetitions = (PART2_ROCKS - rocksBeforePattern) / rocksInPattern
+    val rocksRemaining = PART2_ROCKS - rocksBeforePattern - repetitions * rocksInPattern
+
+    val height = pattern.startValues.sum().toLong() +
+        pattern.values.sum().toLong() * repetitions +
+        pattern.values.take(rocksRemaining.toInt()).sum()
+
+    val want = if (stage == "problem") PART2_PROBLEM_ANSWER else PART2_EXAMPLE_ANSWER
+    printAnswer(height, want, "Part 2")
+}
+
+var singleHeightDiffs = mutableListOf<Int>()
+var lastSingleHeight = 0
+var heightDiffs = mutableListOf<Int>()
+var lastHeight = 0
+
+fun findRepeatingPattern(sim: simulation): Pattern? {
+    // Track the diffs for single rocks
+    val newSingleHeight = sim.height()
+    val singleHeightDiff = newSingleHeight - lastSingleHeight
+    lastSingleHeight = newSingleHeight
+    singleHeightDiffs.add(singleHeightDiff)
+
+    // And track the diffs for sets of rocks
+    if (sim.numRocks % ROCKS.size == 0) {
+        val newHeight = sim.height()
+        val heightDiff = newHeight - lastHeight
+        lastHeight = newHeight
+        heightDiffs.add(heightDiff)
+
+        // If we find a repeating pattern in rock sets...
+        val p = findPattern(heightDiffs) ?: return null
+        // build up a pattern for single rocks and return it
+        return Pattern(
+            singleHeightDiffs.takeLast(p.values.size * ROCKS.size),
+            singleHeightDiffs.take(singleHeightDiffs.size % (p.values.size * ROCKS.size))
+        )
+    }
+    return null
+}
+
+data class Pattern(val values: List<Int>, val startValues: List<Int>)
+fun findPattern(input: List<Int>): Pattern? {
+    for (s in 2..input.size / 2) {
+        val reps = (input.size / s)
+        val lastPart = input.takeLast(s * reps)
+        val p = lastPart.take(s)
+        if (lastPart.windowed(s, s).all { it == p }) {
+            return Pattern(p, input.take(input.size - s * reps))
+        }
+    }
+    return null
 }
