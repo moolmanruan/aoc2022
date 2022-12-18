@@ -1,5 +1,8 @@
+package day14
+
 import grid.Coord
 import grid.plus
+import output.printAnswer
 import kotlin.math.sign
 
 typealias Rock = Coord
@@ -62,7 +65,7 @@ class SandSimulation(private val rocks: Set<Rock>, private val sandOrigin: Coord
     }
 }
 
-fun day14(input: String): String {
+fun run(input: String, stage: String): String {
     val rocksSets = input.split("\n").map(::stringToRocks)
     val rocks = mutableSetOf<Rock>()
     for (r in rocksSets) {
@@ -71,9 +74,12 @@ fun day14(input: String): String {
 
     val simInf = SandSimulation(rocks, Coord(500, 0), false)
     while (simInf.step()) {}
-    println("Part 1:$ANSI_BLUE ${simInf.sand.size}$ANSI_WHITE want 901 example 24$ANSI_RESET")
+    val want1 = if (stage == "problem") 901 else 24
+    printAnswer(simInf.sand.size, want1, "Part 1")
 
     val simFloor = SandSimulation(rocks, Coord(500, 0))
     while (simFloor.step()) {}
-    return simFloor.sand.size.toString() + "$ANSI_WHITE want 24589 example 93"
+    val want2 = if (stage == "problem") 24589 else 93
+    printAnswer(simFloor.sand.size, want2, "Part 2")
+    return ""
 }

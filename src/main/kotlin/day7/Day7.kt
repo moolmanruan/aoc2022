@@ -1,3 +1,7 @@
+package day7
+
+import output.printAnswer
+
 data class File(val name: String, val size: Int)
 data class Directory(val name: String, val parent: Directory?, val dirs: MutableList<Directory>, val files: MutableList<File>)
 
@@ -51,7 +55,7 @@ fun walk(dir: Directory, fn: (Directory) -> Unit) {
 const val totalAvailable = 70000000
 const val freeSpaceRequired = 30000000
 
-fun day7(input: String): String {
+fun run(input: String, stage: String): String {
     val root = newDir("/", null)
     var pwd = root
 
@@ -68,10 +72,14 @@ fun day7(input: String): String {
     val dirSizes = ArrayList<Int>()
     walk(root) { dirSizes.add(it.size()) }
 
-    println("Part one: $ANSI_BLUE${dirSizes.filter { it < 100000 }.sum()}$ANSI_RESET")
+    val want1 = if (stage == "problem") 1454188 else 95437
+    printAnswer(dirSizes.filter { it < 100000 }.sum(), want1, "Part 1")
 
     val requiredToDelete = freeSpaceRequired - (totalAvailable - root.size())
-    println("Required space: $ANSI_YELLOW$requiredToDelete$ANSI_RESET")
+    println("Required space: ${output.ANSI_YELLOW}$requiredToDelete${output.ANSI_RESET}")
 
-    return dirSizes.filter { it >= requiredToDelete }.sorted().first().toString()
+    val ans2 = dirSizes.filter { it >= requiredToDelete }.sorted().first().toString()
+    val want2 = if (stage == "problem") 4183246 else 24933642
+    printAnswer(ans2, want2, "Part 2")
+    return ""
 }

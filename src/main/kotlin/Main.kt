@@ -1,4 +1,3 @@
-
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.io.path.Path
@@ -37,26 +36,26 @@ fun run(year: Int, day: Int, stage: String) {
             }
         }
 
-        val input = inputFile.readText().trim()
+        val input = inputFile.readText().trim('\n')
 
         println("Day: ${ANSI_GREEN}$day$ANSI_RESET, Stage: ${ANSI_GREEN}$stage$ANSI_RESET")
         val answer = when (day) {
-            1 -> day1(input)
-            2 -> day2(input)
-            3 -> day3(input)
-            4 -> day4(input)
-            5 -> day5(input)
-            6 -> day6(input)
-            7 -> day7(input)
-            8 -> day8(input)
-            9 -> day9(input)
-            10 -> day10(input)
-            11 -> day11(input)
-            12 -> day12(input)
-            13 -> day13(input)
-            14 -> day14(input)
-            15 -> day15(input, stage)
-            151 -> day15.run(input)
+            1 -> day1.run(input, stage)
+            2 -> day2.run(input, stage)
+            3 -> day3.run(input, stage)
+            4 -> day4.run(input, stage)
+            5 -> day5.run(input, stage)
+            6 -> day6.run(input, stage)
+            7 -> day7.run(input, stage)
+            8 -> day8.run(input, stage)
+            9 -> day9.run(input, stage)
+            10 -> day10.run(input, stage)
+            11 -> day11.run(input, stage)
+            12 -> day12.run(input, stage)
+            13 -> day13.run(input, stage)
+            14 -> day14.run(input, stage)
+            15 -> day15.run(input, stage)
+            151 -> day151.run(input, stage)
             16 -> day16.run(input, stage)
             17 -> day17.run(input, stage)
             18 -> day18.run(input, stage)

@@ -1,130 +1,124 @@
 package day15
 
 import grid.Coord
-import grid.l1Distance
-import kotlin.math.max
-import kotlin.math.min
+import grid.minus
+import output.printAnswer
+import java.math.BigInteger
+import kotlin.math.absoluteValue
 
-data class AreaVec2(val i: Int, val j: Int)
-
-fun AreaVec2.toCoord(): Coord {
-    return Coord((i + j) / 2, (-i + j) / 2)
+enum class ObjectKind {
+    SENSOR,
+    BEACON
 }
 
-fun AreaVec2.x(): Double {
-    return (i + j) / 2.0
-}
-fun AreaVec2.y(): Double {
-    return (-i + j) / 2.0
-}
+data class SensorInfo(val pos: Coord, val beacon: Coord)
 
-operator fun AreaVec2.plus(other: AreaVec2): AreaVec2 {
-    return AreaVec2(i + other.i, j + other.j)
-}
-operator fun AreaVec2.minus(other: AreaVec2): AreaVec2 {
-    return AreaVec2(i - other.i, j - other.j)
-}
+fun SensorInfo.border(): List<Coord> {
+    val dist = range() + 1
+    val cc = mutableSetOf<Coord>()
+    for (d in 0..dist) {
+        val xd = dist - d
+        val yd = dist - xd
 
-fun Coord.toAreaVec2(): AreaVec2 {
-    return AreaVec2(x - y, x + y)
-}
-
-// Area is rectangular area rotation 45º on a cartesian map.
-// `pos` is the left corner of the area
-// `size` is the number of positions in each direction
-//   `i` indicating the number in the +x,-y direction
-//   `j` indicating the number in the +x,+y direction
-data class Area(val pos: AreaVec2, val size: AreaVec2)
-
-fun Area.overlap(other: Area): Area? {
-    if (this == other) {
-        return this
+        cc.add(Coord(pos.x - xd, pos.y - yd))
+        cc.add(Coord(pos.x - xd, pos.y + yd))
+        cc.add(Coord(pos.x + xd, pos.y - yd))
+        cc.add(Coord(pos.x + xd, pos.y + yd))
     }
-    val a = pos
-    val b = other.pos
-//    println("a $pos b ${other.pos}")
-
-    val iMin = max(a.i, b.i)
-    val iMax = min(a.i + size.i, b.i + other.size.i)
-//    println("i $iMin $iMax")
-    if (iMin >= iMax) {
-        return null
-    }
-    val jMin = max(a.j, b.j)
-    val jMax = min(a.j + size.j, b.j + other.size.j)
-//    println("j $jMin $jMax")
-    if (jMin >= jMax) {
-        return null
-    }
-    return Area(
-        AreaVec2(iMin, jMin),
-        AreaVec2(iMax - iMin, jMax - jMin)
-    )
+    return cc.toList()
 }
 
-fun Area.points(): Long {
-    return if ((pos.i + pos.j) % 2 == 0) {
-        ((size.i.toLong() + 1) * (size.j.toLong() + 1) + 1) / 2
-    } else {
-        (size.i.toLong() + 1) * (size.j.toLong() + 1) / 2
-    }
-}
-fun Area.pointsOnAndAboveX(x1: Int): Long {
-    val cxMin = pos.x()
-    if (x1 < cxMin) {
-        return points()
-    }
-
-    val cxMax = (pos + size).x()
-    if (x1 > cxMax) {
-        return 0
-    }
-    fun pyramid(b: Int): Int {
-        return b * (b + 1)
-    }
-
-    val x = (x1 - cxMin).toInt()
-    val xBetween = (cxMin * 2).toInt() % 2 == 1
-    val minSize = min(size.i, size.j)
-    val maxSize = max(size.i, size.j)
-
-    var sub = pyramid(x)
-    var xOverMin = x - minSize / 2
-
-    if (!xBetween) {
-        sub -= x
-        xOverMin -= 1
-    }
-
-    if (xOverMin > 0) {
-        sub -= pyramid(xOverMin)
-    }
-    val xOverMax = x - 1 - maxSize / 2
-    if (xOverMax > 0) {
-        sub -= pyramid(xOverMax)
-    }
-    return points() - sub
+fun SensorInfo.mirrorXRight(c: Coord): Coord {
+    val diff = pos.x - c.x
+    return Coord(pos.x + diff.absoluteValue, c.y)
 }
 
-fun String.toArea(): Area {
+fun SensorInfo.range(): Int {
+    return l1(pos, beacon)
+}
+
+fun SensorInfo.inRange(c: Coord): Boolean {
+    return l1(this.pos, c) <= range()
+}
+
+fun SensorInfo.reachMin(): Coord {
+    return Coord(pos.x - range(), pos.y - range())
+}
+fun SensorInfo.reachMax(): Coord {
+    val dist = l1(pos, beacon)
+    return Coord(pos.x + dist, pos.y + dist)
+}
+
+fun String.toSensorInfo(): SensorInfo {
     val sp = this.split(":").first().trim().split(",")
     val bp = this.split(":").last().trim().split(",")
     val pos = Coord(sp.first().toInt(), sp.last().toInt())
     val beacon = Coord(bp.first().toInt(), bp.last().toInt())
-    val d = pos.l1Distance(beacon)
-    return Area(Coord(pos.x - d, pos.y).toAreaVec2(), AreaVec2(d * 2, d * 2))
+    return SensorInfo(pos, beacon)
 }
 
-fun run(input: String): String {
-    val areas = input.split("\n").map(String::toArea)
+fun run(input: String, stage: String): String {
+    val sensors = input.split("\n").map(String::toSensorInfo)
 
-    val overlaps = mutableListOf<Area>()
-    for (ia in 0 until areas.size - 1) {
-        for (ib in ia + 1 until areas.size) {
-            val overlap = areas[ia].overlap(areas[ib])
-            if (overlap != null) {
+    val objMap = mutableMapOf<Coord, ObjectKind>()
+    sensors.forEach {
+        objMap[it.pos] = ObjectKind.SENSOR
+        objMap[it.beacon] = ObjectKind.BEACON
+    }
+
+    var emptyCount = 0
+    val minX = sensors.minOf { it.reachMin().x }
+    val maxX = sensors.maxOf { it.reachMax().x }
+    val y = if (stage == "example") 10 else 2000000
+    for (x in minX..maxX) {
+        val c = Coord(x, y)
+        if (c in objMap) {
+            continue
+        }
+        for (s in sensors) {
+            if (l1(s.pos, c) <= s.range()) {
+                emptyCount++
+                break
             }
         }
     }
+    val want1 = if (stage == "example") "26" else "5142231"
+    printAnswer(emptyCount, want1, "Part 1")
+
+    val maxXY = if (stage == "example")20 else 4000000
+    val startTime = System.currentTimeMillis()
+    val distressBeacon = findBeacon(sensors, objMap, Coord(maxXY, maxXY))!!
+    val endTime = System.currentTimeMillis()
+    println("Distress beacon found at $distressBeacon in ${(endTime - startTime) / 1000.0} seconds")
+
+    fun toFreq(c: Coord): BigInteger {
+        val xBig = BigInteger.valueOf(c.x.toLong())
+        val maxF = BigInteger.valueOf(4000000)
+        val yBig = BigInteger.valueOf(c.y.toLong())
+        return xBig.multiply(maxF) + yBig
+    }
+    val want2 = if (stage == "example") "56000011" else "10884459367718"
+    printAnswer(toFreq(distressBeacon), want2, "Part 2")
     return ""
+}
+
+fun findBeacon(sensors: List<SensorInfo>, objMap: Map<Coord, ObjectKind>, maxPos: Coord): Coord? {
+    for (border in sensors.map(SensorInfo::border)) {
+        val borderInBounds = border.filter {
+            it.x >= 0 && it.x <= maxPos.x && it.y >= 0 && it.y <= maxPos.x
+        }
+        for (c in borderInBounds) {
+            if (c !in objMap && !posUsed(sensors, c)) { return c }
+        }
+    }
+    return null
+}
+
+fun posUsed(sensors: List<SensorInfo>, pos: Coord): Boolean {
+    return sensors.find { it.inRange(pos) } != null
+}
+
+fun l1(a: Coord, b: Coord): Int {
+    val d = b - a
+    return d.x.absoluteValue + d.y.absoluteValue
 }

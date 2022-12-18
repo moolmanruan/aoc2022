@@ -1,4 +1,6 @@
+package day10
 import grid.Coord
+import output.printAnswer
 import kotlin.math.absoluteValue
 
 enum class CmdKind { NOOP, ADD }
@@ -16,7 +18,7 @@ fun String.toCommand(): Command {
 
 data class CPU(var x: Int)
 
-fun day10(input: String): String {
+fun run(input: String, stage: String): String {
     val cmds = input.split("\n").map(String::toCommand)
     val cpuStates = mutableListOf(CPU(1))
     var cpu = cpuStates.last()
@@ -37,7 +39,8 @@ fun day10(input: String): String {
     for (i in 20.until(cpuStates.size) step 40) {
         signalStrength.add(cpuStates[i - 1].x * i)
     }
-    println("part one: $ANSI_BLUE${signalStrength.sum()}$ANSI_RESET ${ANSI_WHITE}want 13720$ANSI_RESET")
+    val want1 = if (stage == "problem") 13720 else 13140
+    printAnswer(signalStrength.sum(), want1, "Part 1")
 
     val screen = grid.NewGrid(40, 6, " ").toMutableGrid()
     for (i in cpuStates.indices) {
@@ -47,5 +50,22 @@ fun day10(input: String): String {
             screen.setSafe(pixelPos.x, pixelPos.y, "█")
         }
     }
-    return "${ANSI_WHITE}want FBURHZCH${ANSI_BLUE}\n$screen"
+    val want2 = if (stage == "problem") PART2_PROBLEM else PART2_EXAMPLE
+    printAnswer("\n" + screen, want2, "Part 2")
+    return ""
 }
+
+const val PART2_PROBLEM = """
+████ ███  █  █ ███  █  █ ████  ██  █  █ 
+█    █  █ █  █ █  █ █  █    █ █  █ █  █ 
+███  ███  █  █ █  █ ████   █  █    ████ 
+█    █  █ █  █ ███  █  █  █   █    █  █ 
+█    █  █ █  █ █ █  █  █ █    █  █ █  █ 
+█    ███   ██  █  █ █  █ ████  ██  █  █ """
+const val PART2_EXAMPLE = """
+██  ██  ██  ██  ██  ██  ██  ██  ██  ██  
+███   ███   ███   ███   ███   ███   ███ 
+████    ████    ████    ████    ████    
+█████     █████     █████     █████     
+██████      ██████      ██████      ████
+███████       ███████       ███████     """

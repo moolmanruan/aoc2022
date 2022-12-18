@@ -1,4 +1,7 @@
+package day8
+
 import grid.plus
+import output.printAnswer
 
 fun visible(g: grid.Grid<Int>, c: grid.Coord, dir: grid.Coord): Boolean {
     val v = g.get(c.x, c.y)
@@ -26,7 +29,7 @@ fun numVisible(g: grid.Grid<Int>, c: grid.Coord, dir: grid.Coord): Int {
     return count
 }
 
-fun day8(input: String): String {
+fun run(input: String, stage: String): String {
     val g = grid.NewGridFromString(input, "") { it.toInt() }
 
     // part one
@@ -44,7 +47,8 @@ fun day8(input: String): String {
 
     var sum = 0
     vis.forEach { if (it) sum++ }
-    println("part one: $sum")
+    val want1 = if (stage == "problem") 1816 else 21
+    printAnswer(sum, want1, "Part 1")
 
     // part two
     val scenic = grid.NewGrid(g.width(), g.height(), 0).toMutableGrid()
@@ -60,5 +64,7 @@ fun day8(input: String): String {
     }
     var best = 0
     scenic.forEach { if (it > best) best = it }
-    return "$best"
+    val want2 = if (stage == "problem") 383520 else 8
+    printAnswer(best, want2, "Part 2")
+    return ""
 }

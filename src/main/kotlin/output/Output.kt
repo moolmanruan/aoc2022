@@ -2,7 +2,7 @@ package output
 
 fun <T> printAnswer(got: T, want: T? = null, prefix: String = "") {
     var out = "$ANSI_BLUE$got$ANSI_RESET"
-    if (want != null) {
+    if (want != null && want.toString().isNotEmpty()) {
         val colour = if (got.toString() == want.toString()) ANSI_WHITE else ANSI_RED
         out += "$ANSI_WHITE want $colour$want$ANSI_RESET"
     }

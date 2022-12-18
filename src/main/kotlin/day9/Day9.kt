@@ -1,4 +1,8 @@
-import grid.*
+package day9
+
+import grid.Coord
+import grid.plus
+import output.printAnswer
 import kotlin.math.absoluteValue
 import kotlin.math.sign
 
@@ -7,10 +11,10 @@ data class Move(val dir: Coord, val amount: Int)
 fun String.toMove(): Move {
     val parts = this.trim().split(" ")
     val dir = when (parts.first()) {
-        "U" -> Up
-        "D" -> Down
-        "L" -> Left
-        "R" -> Right
+        "U" -> grid.Up
+        "D" -> grid.Down
+        "L" -> grid.Left
+        "R" -> grid.Right
         else -> Coord(0, 0)
     }
     return Move(dir, parts.last().toInt())
@@ -25,13 +29,7 @@ fun tailNextPos(headPos: Coord, tailPos: Coord): Coord {
     return tailPos + Coord(diffX.sign, diffY.sign)
 }
 
-fun day9(input: String): String {
-    val moves = input.split("\n").map(String::toMove)
-
-    // Part 1
-    // val pieces = MutableList(2) { Coord(0, 0) }
-    // Part 2
-    val pieces = MutableList(10) { Coord(0, 0) }
+fun simulate(pieces: MutableList<Coord>, moves: List<Move>): Int {
     val visited = mutableSetOf<Coord>()
     for (move in moves) {
         for (i in 0.until(move.amount)) {
@@ -45,6 +43,19 @@ fun day9(input: String): String {
             visited.add(pieces.last())
         }
     }
+    return visited.size
+}
 
-    return "${visited.size} (want 2536)"
+fun run(input: String, stage: String): String {
+    val moves = input.split("\n").map(String::toMove)
+
+    // Part 1
+    val pieces1 = MutableList(2) { Coord(0, 0) }
+    val want1 = if (stage == "problem") 6367 else 13
+    printAnswer(simulate(pieces1, moves), want1, "Part 1")
+    // Part 2
+    val pieces2 = MutableList(10) { Coord(0, 0) }
+    val want2 = if (stage == "problem") 2536 else 1
+    printAnswer(simulate(pieces2, moves), want2, "Part 2")
+    return ""
 }

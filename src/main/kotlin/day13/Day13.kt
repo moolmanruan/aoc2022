@@ -1,3 +1,7 @@
+package day13
+
+import output.printAnswer
+
 data class CodePair(val left: String, val right: String)
 
 fun String.toPair(): CodePair {
@@ -71,13 +75,14 @@ fun checkOrder(pairs: List<CodePair>): List<Int> {
         .filter { it >= 0 }
 }
 
-fun day13(input: String): String {
+fun run(input: String, stage: String): String {
     val pairs = input.split("\n\n").map(String::toPair)
 
     val correctlyOrderedPairs = checkOrder(pairs)
     // sum of indices in the right order
     val part1 = correctlyOrderedPairs.sumOf { it + 1 }.toString()
-    println("Part 1: $part1 $ANSI_WHITE(want 5625, example 13)")
+    val want1 = if (stage == "problem") 5625 else 13
+    printAnswer(part1, want1, "Part 1")
 
     val codes = input.replace("\n\n", "\n").split("\n").toMutableList()
     codes.add("[[2]]")
@@ -87,5 +92,7 @@ fun day13(input: String): String {
     val a = sortedCodes.indexOf("[[2]]") + 1
     val b = sortedCodes.indexOf("[[6]]") + 1
 
-    return "${a * b} $ANSI_WHITE(want 23111, example 140)"
+    val want2 = if (stage == "problem") 23111 else 140
+    printAnswer(a * b, want2, "Part 2")
+    return ""
 }

@@ -1,6 +1,9 @@
+package day12
+
 import grid.Coord
 import grid.minus
 import grid.plus
+import output.printAnswer
 
 data class MapPos(val letter: Char)
 
@@ -72,7 +75,7 @@ fun aStar(start: Coord, end: Coord, heightMap: grid.Grid<MapPos>): Path? {
     return null
 }
 
-fun day12(input: String): String {
+fun run(input: String, stage: String): String {
     var startPart1 = Coord(0, 0)
     var end = Coord(0, 0)
     val heightMap = grid.NewGridFromStringIndexed(input, "") { cell, pos ->
@@ -107,8 +110,11 @@ fun day12(input: String): String {
     // Part 1
     val partOnePath = aStar(startPart1, end, heightMap)
     println(partOnePath!!.toString(heightMap.width(), heightMap.height()))
-    println("${partOnePath.length() - 1} want 412 (example want 31)")
+    val want1 = if (stage == "problem") 412 else 31
+    printAnswer(partOnePath.length() - 1, want1, "Part 1")
     // Part 2
     println(bestPath.toString(heightMap.width(), heightMap.height()))
-    return "${bestPath.positions.size - 1} want 402 (example want 29)"
+    val want2 = if (stage == "problem") 402 else 29
+    printAnswer(bestPath.positions.size - 1, want2, "Part 2")
+    return ""
 }

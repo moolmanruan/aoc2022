@@ -1,3 +1,7 @@
+package day3
+
+import output.printAnswer
+
 typealias Item = Char?
 
 fun Item.value(): Int {
@@ -22,18 +26,21 @@ fun String.toRucksack(): Rucksack {
 
 fun groupItem(g: List<String>): Item {
     if (g.size < 3) {
-        println("${ANSI_YELLOW}Group too small$ANSI_RESET")
+        println("${output.ANSI_YELLOW}Group too small${output.ANSI_RESET}")
         return null
     }
     return g[0].find { g[1].contains(it) && g[2].contains(it) }
 }
 
-fun day3(input: String): String {
+fun run(input: String, stage: String): String {
     val lines = input.split("\n")
     val sacks = lines.map(String::toRucksack)
-    val partOne = sacks.map { it.duplicateItem().value() }.sum()
-    println("Answer (part 1): $ANSI_BLUE$partOne$ANSI_RESET")
+    val part1 = sacks.map { it.duplicateItem().value() }.sum()
+    val want1 = if (stage == "problem") 8153 else 157
+    printAnswer(part1, want1, "Part 1")
 
-    val partTwo = lines.windowed(3, 3).map { groupItem(it).value() }.sum()
-    return partTwo.toString()
+    val part2 = lines.windowed(3, 3).map { groupItem(it).value() }.sum()
+    val want2 = if (stage == "problem") 2342 else 70
+    printAnswer(part2, want2, "Part 1")
+    return ""
 }
