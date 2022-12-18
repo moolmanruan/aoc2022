@@ -1,5 +1,6 @@
 package day16
 
+import output.printAnswer
 import java.lang.Exception
 
 data class Valve(
@@ -145,23 +146,23 @@ fun state.replay(maxTicks: Int): String {
 }
 
 fun run(input: String, stage: String) {
+    part(1, input, stage, 1460, 1651)
+    part(2, input, stage, 2117, 1707)
+}
+
+fun part(part: Int, input: String, stage: String, want: Int, wantExample: Int) {
     val startTime = System.currentTimeMillis()
     val valves = toValves(input)
 
     val startingValve = valves.find { it.name == "AA" } ?: throw Exception("Can't find valve AA")
     val activeValves = valves.filter { it.flowRate != 0 }
 
-    // Part 1
-    // val maxTicks = 30
-    // val startEntities = listOf(
-    //    entity(startingValve, 0)
-    // )
-    // Part 2
-    val maxTicks = 26
-    val startEntities = listOf(
-        entity(startingValve, 0),
-        entity(startingValve, 0)
-    )
+    val maxTicks = if (part == 1) 30 else 26
+    val startEntities = if (part == 1) {
+        listOf(entity(startingValve, 0))
+    } else {
+        listOf(entity(startingValve, 0), entity(startingValve, 0))
+    }
 
     val start = state(
         startEntities,
@@ -188,10 +189,5 @@ fun run(input: String, stage: String) {
     }
     println("Time taken ${System.currentTimeMillis() - startTime}ms")
 
-    // Part 1
-    // return "$best want ${if (stage == "problem") "1460" else "1651"}"
-    // Part 2
-    println("$best want ${if (stage == "problem") "2117" else "1707"}")
-
-    // problem alt 1724 part 1
+    printAnswer(best, if (stage == "problem") want else wantExample, "Part $part")
 }
