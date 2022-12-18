@@ -18,7 +18,7 @@ fun String.toCommand(): Command {
 
 data class CPU(var x: Int)
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val cmds = input.split("\n").map(String::toCommand)
     val cpuStates = mutableListOf(CPU(1))
     var cpu = cpuStates.last()
@@ -52,7 +52,6 @@ fun run(input: String, stage: String): String {
     }
     val want2 = if (stage == "problem") PART2_PROBLEM else PART2_EXAMPLE
     printAnswer("\n" + screen, want2, "Part 2")
-    return ""
 }
 
 const val PART2_PROBLEM = """

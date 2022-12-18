@@ -55,7 +55,7 @@ fun walk(dir: Directory, fn: (Directory) -> Unit) {
 const val totalAvailable = 70000000
 const val freeSpaceRequired = 30000000
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val root = newDir("/", null)
     var pwd = root
 
@@ -81,5 +81,4 @@ fun run(input: String, stage: String): String {
     val ans2 = dirSizes.filter { it >= requiredToDelete }.sorted().first().toString()
     val want2 = if (stage == "problem") 4183246 else 24933642
     printAnswer(ans2, want2, "Part 2")
-    return ""
 }

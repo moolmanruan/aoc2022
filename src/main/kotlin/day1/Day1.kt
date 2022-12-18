@@ -2,10 +2,9 @@ package day1
 
 import output.printAnswer
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     part1(input, stage)
     part2(input, stage)
-    return ""
 }
 
 fun part1(input: String, stage: String) {

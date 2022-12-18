@@ -22,10 +22,9 @@ fun String.toVec3(): Vec3 {
     return Vec3(p[0].toInt(), p[1].toInt(), p[2].toInt())
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     part1(input, stage)
     part2(input, stage)
-    return ""
 }
 
 fun part1(input: String, stage: String) {

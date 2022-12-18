@@ -21,13 +21,13 @@ fun process(code: String, size: Int): Int {
     return index + size
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val codes = input.split("\n")
     val ans1 = codes.map { process(it, 4) }
     val want1 = if (stage == "problem") "[1965]" else "[7, 5, 6, 10, 11]"
     printAnswer(ans1, want1, "Part 1")
+
     val ans2 = codes.map { process(it, 14) }
     val want2 = if (stage == "problem") "[2773]" else "[19, 23, 23, 29, 26]"
     printAnswer(ans2, want2, "Part 2")
-    return ""
 }

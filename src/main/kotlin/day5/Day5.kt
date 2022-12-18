@@ -52,8 +52,7 @@ fun part2(input: String, stage: String) {
     printAnswer(ans, want, "Part 2")
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     part1(input, stage)
     part2(input, stage)
-    return ""
 }

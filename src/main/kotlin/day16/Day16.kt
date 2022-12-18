@@ -144,7 +144,7 @@ fun state.replay(maxTicks: Int): String {
     return lines.joinToString("\n")
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val startTime = System.currentTimeMillis()
     val valves = toValves(input)
 
@@ -191,7 +191,7 @@ fun run(input: String, stage: String): String {
     // Part 1
     // return "$best want ${if (stage == "problem") "1460" else "1651"}"
     // Part 2
-    return "$best want ${if (stage == "problem") "2117" else "1707"}"
+    println("$best want ${if (stage == "problem") "2117" else "1707"}")
 
     // problem alt 1724 part 1
 }

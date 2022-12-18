@@ -46,7 +46,7 @@ fun simulate(pieces: MutableList<Coord>, moves: List<Move>): Int {
     return visited.size
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val moves = input.split("\n").map(String::toMove)
 
     // Part 1
@@ -57,5 +57,4 @@ fun run(input: String, stage: String): String {
     val pieces2 = MutableList(10) { Coord(0, 0) }
     val want2 = if (stage == "problem") 2536 else 1
     printAnswer(simulate(pieces2, moves), want2, "Part 2")
-    return ""
 }

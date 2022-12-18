@@ -57,7 +57,7 @@ fun String.toSensorInfo(): SensorInfo {
     return SensorInfo(pos, beacon)
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val sensors = input.split("\n").map(String::toSensorInfo)
 
     val objMap = mutableMapOf<Coord, ObjectKind>()
@@ -99,7 +99,6 @@ fun run(input: String, stage: String): String {
     }
     val want2 = if (stage == "example") "56000011" else "10884459367718"
     printAnswer(toFreq(distressBeacon), want2, "Part 2")
-    return ""
 }
 
 fun findBeacon(sensors: List<SensorInfo>, objMap: Map<Coord, ObjectKind>, maxPos: Coord): Coord? {

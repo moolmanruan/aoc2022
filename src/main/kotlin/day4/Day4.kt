@@ -25,13 +25,13 @@ fun String.toAssignment(): Assignment {
     val parts = this.split("-")
     return Assignment(parts[0].toInt(), parts[1].toInt())
 }
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val ranges = input.split("\n").map(String::toRange)
     val partOne = ranges.count { it.fullOverlap() }.toString()
     val want1 = if (stage == "problem") 433 else 2
     printAnswer(partOne, want1, "Part 1")
+
     val part2 = ranges.count { it.partialOverlap() }.toString()
     val want2 = if (stage == "problem") 852 else 4
     printAnswer(part2, want2, "Part 2")
-    return ""
 }

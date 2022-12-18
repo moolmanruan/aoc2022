@@ -108,7 +108,7 @@ fun play(monkeys: List<Monkey>, rounds: Int, inspectFn: (monkey: Monkey, monkeys
         .toString()
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val monkeysText = input.split("\n\n")
 
     val monkeys = monkeysText.mapIndexed { i, v -> toMonkey(i, v) }
@@ -125,5 +125,4 @@ fun run(input: String, stage: String): String {
     val ans2 = play(monkeys.map { it.clone() }, 10000, ::inspectItemPart2)
     val want2 = if (stage == "problem") 30599555965 else 2713310158
     printAnswer(ans2, want2, "Part 2")
-    return ""
 }

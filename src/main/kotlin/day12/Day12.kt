@@ -75,7 +75,7 @@ fun aStar(start: Coord, end: Coord, heightMap: grid.Grid<MapPos>): Path? {
     return null
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     var startPart1 = Coord(0, 0)
     var end = Coord(0, 0)
     val heightMap = grid.NewGridFromStringIndexed(input, "") { cell, pos ->
@@ -116,5 +116,4 @@ fun run(input: String, stage: String): String {
     println(bestPath.toString(heightMap.width(), heightMap.height()))
     val want2 = if (stage == "problem") 402 else 29
     printAnswer(bestPath.positions.size - 1, want2, "Part 2")
-    return ""
 }

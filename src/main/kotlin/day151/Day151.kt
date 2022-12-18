@@ -115,7 +115,7 @@ fun String.toArea(): Area {
     return Area(Coord(pos.x - d, pos.y).toAreaVec2(), AreaVec2(d * 2, d * 2))
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val areas = input.split("\n").map(String::toArea)
 
     val overlaps = mutableListOf<Area>()
@@ -126,5 +126,4 @@ fun run(input: String, stage: String): String {
             }
         }
     }
-    return ""
 }

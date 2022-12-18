@@ -32,7 +32,7 @@ fun groupItem(g: List<String>): Item {
     return g[0].find { g[1].contains(it) && g[2].contains(it) }
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val lines = input.split("\n")
     val sacks = lines.map(String::toRucksack)
     val part1 = sacks.map { it.duplicateItem().value() }.sum()
@@ -42,5 +42,4 @@ fun run(input: String, stage: String): String {
     val part2 = lines.windowed(3, 3).map { groupItem(it).value() }.sum()
     val want2 = if (stage == "problem") 2342 else 70
     printAnswer(part2, want2, "Part 1")
-    return ""
 }

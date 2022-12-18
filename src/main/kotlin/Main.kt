@@ -39,7 +39,7 @@ fun run(year: Int, day: Int, stage: String) {
         val input = inputFile.readText().trim('\n')
 
         println("Day: ${ANSI_GREEN}$day$ANSI_RESET, Stage: ${ANSI_GREEN}$stage$ANSI_RESET")
-        val answer = when (day) {
+        when (day) {
             1 -> day1.run(input, stage)
             2 -> day2.run(input, stage)
             3 -> day3.run(input, stage)
@@ -59,9 +59,8 @@ fun run(year: Int, day: Int, stage: String) {
             16 -> day16.run(input, stage)
             17 -> day17.run(input, stage)
             18 -> day18.run(input, stage)
-            else -> ""
+            else -> throw Exception("Invalid day")
         }
-        if (answer.isNotEmpty()) println("${ANSI_RESET}Answer: $ANSI_BLUE$answer$ANSI_RESET")
     } catch (ex: Exception) {
         printErr(ex.toString())
     }

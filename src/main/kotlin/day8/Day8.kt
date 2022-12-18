@@ -29,7 +29,7 @@ fun numVisible(g: grid.Grid<Int>, c: grid.Coord, dir: grid.Coord): Int {
     return count
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val g = grid.NewGridFromString(input, "") { it.toInt() }
 
     // part one
@@ -66,5 +66,4 @@ fun run(input: String, stage: String): String {
     scenic.forEach { if (it > best) best = it }
     val want2 = if (stage == "problem") 383520 else 8
     printAnswer(best, want2, "Part 2")
-    return ""
 }

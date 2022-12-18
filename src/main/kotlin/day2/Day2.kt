@@ -5,10 +5,9 @@ import output.printAnswer
 enum class Throw { ROCK, PAPER, SCISSORS }
 enum class Result { LOSE, DRAW, WIN }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     part1(input, stage)
     part2(input, stage)
-    return ""
 }
 
 data class Round1(val opp: Throw, val me: Throw)

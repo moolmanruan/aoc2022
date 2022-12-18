@@ -65,7 +65,7 @@ class SandSimulation(private val rocks: Set<Rock>, private val sandOrigin: Coord
     }
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val rocksSets = input.split("\n").map(::stringToRocks)
     val rocks = mutableSetOf<Rock>()
     for (r in rocksSets) {
@@ -81,5 +81,4 @@ fun run(input: String, stage: String): String {
     while (simFloor.step()) {}
     val want2 = if (stage == "problem") 24589 else 93
     printAnswer(simFloor.sand.size, want2, "Part 2")
-    return ""
 }

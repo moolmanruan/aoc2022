@@ -75,7 +75,7 @@ fun checkOrder(pairs: List<CodePair>): List<Int> {
         .filter { it >= 0 }
 }
 
-fun run(input: String, stage: String): String {
+fun run(input: String, stage: String) {
     val pairs = input.split("\n\n").map(String::toPair)
 
     val correctlyOrderedPairs = checkOrder(pairs)
@@ -94,5 +94,4 @@ fun run(input: String, stage: String): String {
 
     val want2 = if (stage == "problem") 23111 else 140
     printAnswer(a * b, want2, "Part 2")
-    return ""
 }
