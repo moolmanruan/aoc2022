@@ -24,46 +24,47 @@ fun main(args: Array<String>) {
 }
 
 fun run(year: Int, day: Int, stage: String) {
-    try {
-        val inputFile = File("/Users/ruan/aoc2022/src/main/resources/$year/$day/$stage.txt")
+//    try {
+    val inputFile = File("/Users/ruan/aoc2022/src/main/resources/$year/$day/$stage.txt")
 
-        if (!inputFile.exists()) {
-            if (stage == "problem") {
-                downloadFile(2022, day, inputFile)
-            } else {
-                Path(inputFile.parent).createDirectories()
-                inputFile.createNewFile()
-            }
+    if (!inputFile.exists()) {
+        if (stage == "problem") {
+            downloadFile(2022, day, inputFile)
+        } else {
+            Path(inputFile.parent).createDirectories()
+            inputFile.createNewFile()
         }
-
-        val input = inputFile.readText().trim('\n')
-
-        println("Day: ${ANSI_GREEN}$day$ANSI_RESET, Stage: ${ANSI_GREEN}$stage$ANSI_RESET")
-        when (day) {
-            1 -> day1.run(input, stage)
-            2 -> day2.run(input, stage)
-            3 -> day3.run(input, stage)
-            4 -> day4.run(input, stage)
-            5 -> day5.run(input, stage)
-            6 -> day6.run(input, stage)
-            7 -> day7.run(input, stage)
-            8 -> day8.run(input, stage)
-            9 -> day9.run(input, stage)
-            10 -> day10.run(input, stage)
-            11 -> day11.run(input, stage)
-            12 -> day12.run(input, stage)
-            13 -> day13.run(input, stage)
-            14 -> day14.run(input, stage)
-            15 -> day15.run(input, stage)
-            151 -> day151.run(input, stage)
-            16 -> day16.run(input, stage)
-            17 -> day17.run(input, stage)
-            18 -> day18.run(input, stage)
-            else -> throw Exception("Invalid day")
-        }
-    } catch (ex: Exception) {
-        printErr(ex.toString())
     }
+
+    val input = inputFile.readText().trim('\n')
+
+    println("Day: ${ANSI_GREEN}$day$ANSI_RESET, Stage: ${ANSI_GREEN}$stage$ANSI_RESET")
+    when (day) {
+        1 -> day1.run(input, stage)
+        2 -> day2.run(input, stage)
+        3 -> day3.run(input, stage)
+        4 -> day4.run(input, stage)
+        5 -> day5.run(input, stage)
+        6 -> day6.run(input, stage)
+        7 -> day7.run(input, stage)
+        8 -> day8.run(input, stage)
+        9 -> day9.run(input, stage)
+        10 -> day10.run(input, stage)
+        11 -> day11.run(input, stage)
+        12 -> day12.run(input, stage)
+        13 -> day13.run(input, stage)
+        14 -> day14.run(input, stage)
+        15 -> day15.run(input, stage)
+        151 -> day151.run(input, stage)
+        16 -> day16.run(input, stage)
+        17 -> day17.run(input, stage)
+        18 -> day18.run(input, stage)
+        19 -> day19.run(input, stage)
+        else -> throw Exception("Invalid day")
+    }
+//    } catch (ex: Exception) {
+//        printErr(ex.toString())
+//    }
 }
 
 fun downloadFile(year: Int, day: Int, path: File) {
