@@ -55,7 +55,6 @@ fun run(year: Int, day: Int, stage: String) {
         13 -> day13.run(input, stage)
         14 -> day14.run(input, stage)
         15 -> day15.run(input, stage)
-        151 -> day151.run(input, stage)
         16 -> day16.run(input, stage)
         17 -> day17.run(input, stage)
         18 -> day18.run(input, stage)
