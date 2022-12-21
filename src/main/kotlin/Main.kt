@@ -60,6 +60,7 @@ fun run(year: Int, day: Int, stage: String) {
         18 -> day18.run(input, stage)
         19 -> day19.run(input, stage)
         20 -> day20.run(input, stage)
+        21 -> day21.run(input, stage)
         else -> throw Exception("Invalid day")
     }
 //    } catch (ex: Exception) {
