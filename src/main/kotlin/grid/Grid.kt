@@ -39,6 +39,12 @@ open class Grid<T>(private val data: List<List<T>>) {
     fun getSafe(c: Coord, default: T): T {
         return getSafe(c.x, c.y, default)
     }
+    fun getWrapped(c: Coord): T {
+        return get(c.x.mod(width()), c.y.mod(height()))
+    }
+    fun getWrappedSafe(c: Coord, default: T): T {
+        return getSafe(c.x.mod(width()), c.y.mod(height()), default)
+    }
     fun get(x: Int, y: Int): T {
         return this.data[y][x]
     }
