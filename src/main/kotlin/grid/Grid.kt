@@ -33,6 +33,9 @@ fun Coord.l1Distance(other: Coord): Int {
 }
 
 open class Grid<T>(private val data: List<List<T>>) {
+
+    private var cachedWidth = -1
+
     fun get(c: Coord): T {
         return get(c.x, c.y)
     }
@@ -52,7 +55,10 @@ open class Grid<T>(private val data: List<List<T>>) {
         return if (contains(x, y)) this.get(x, y) else default
     }
     fun width(): Int {
-        return if (this.data.isNotEmpty()) this.data.first().size else 0
+        if (cachedWidth < 0) {
+            cachedWidth = data.maxOf { it.size }
+        }
+        return cachedWidth
     }
     fun height(): Int {
         return this.data.size
@@ -94,6 +100,16 @@ open class Grid<T>(private val data: List<List<T>>) {
             newData.add(row.toMutableList())
         }
         return MutableGrid(newData)
+    }
+
+    fun subGrid(x: Int, y: Int, w: Int, h: Int): MutableGrid<T> {
+        val g = NewGrid(w, h, get(Coord(0, 0))).toMutableGrid()
+        for (xi in 0.until(w)) {
+            for (yi in 0.until(h)) {
+                g.set(Coord(xi, yi), get(x + xi, y + yi))
+            }
+        }
+        return g
     }
 }
 
