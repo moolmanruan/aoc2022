@@ -37,12 +37,26 @@ fun part2(inputElves: List<Elf>, stage: String) {
     var elves = inputElves.toList()
     var prevElves = emptyList<Elf>()
     var round = 0
+    val delay = if (stage == "example") 100 else 1
+    val gf = if (stage == "example") {
+        GifTextFile("$stage.txt", delay, -3, 10, -9, 3)
+    } else {
+        GifTextFile("$stage.txt", delay, -14, 120, -121, 14)
+    }
+    gf.create()
+    gf.addFrame(elves)
+
     // Check at what round the elves stop moving
     while (prevElves != elves) {
         prevElves = elves.toList()
         elves = tickElves(elves, round)
         round++
+
+        gf.addFrame(elves)
     }
+    gf.addFrame(elves, delay * 10)
+    println("X (${elves.minOf { it.x }}:${elves.maxOf { it.x }})")
+    println("Y (${elves.minOf { it.y }}:${elves.maxOf { it.y }})")
 
     val want = if (stage == "problem") 923 else 20
     printAnswer(round, want, "Part 2")
