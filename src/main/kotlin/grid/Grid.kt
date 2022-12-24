@@ -4,6 +4,8 @@ import kotlin.math.absoluteValue
 
 data class Coord(val x: Int, val y: Int)
 
+val Nothing = Coord(0, 0)
+
 val Up = Coord(0, 1)
 val Down = Coord(0, -1)
 val Left = Coord(-1, 0)
