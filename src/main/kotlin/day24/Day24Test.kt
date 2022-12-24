@@ -142,6 +142,7 @@ class Day24Test {
             emptyList<Coord>(),
             nextStates(Coord(2, 1), bs)
         )
+
         bs = """
             #####
             #.vv#
@@ -151,6 +152,17 @@ class Day24Test {
         assertEquals(
             listOf(Coord(1, 1)),
             nextStates(Coord(2, 1), bs)
+        )
+
+        bs = """
+            ####
+            #>>#
+            #<<#
+            ####
+        """.trimIndent().toState()
+        assertEquals(
+            listOf(Coord(2, 3)),
+            nextStates(Coord(2, 2), bs)
         )
     }
 }

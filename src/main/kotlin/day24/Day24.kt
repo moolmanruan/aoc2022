@@ -101,42 +101,63 @@ fun String.toState(): BlizzardState {
 }
 
 fun run(input: String, stage: String) {
-    part1(input, stage)
+//    part1(input, stage)
+    part2(input, stage)
 }
 
-val startPos = Coord(1, 0)
-fun part1(input: String, stage: String) {
-    var blizzard = input.toState()
-    var positions = listOf(startPos)
-
+fun findPath(start: Coord, destination: Coord, startState: BlizzardState): Pair<Int, BlizzardState> {
     var round = 0
+    var positions = listOf(start)
+    var blizzard = startState
+
     while (true) {
         round++
-        println("$round ${positions.size}")
         blizzard = blizzard.next()
         val newPositions = mutableSetOf<Coord>()
         positions.forEach { p ->
             newPositions.addAll(nextStates(p, blizzard))
         }
-        if (blizzard.size in newPositions) {
+        if (destination in newPositions) {
             break
         }
         positions = newPositions.sortedBy { it.l1Distance(blizzard.size) }
-//        println(blizzard.asString())
-//        println(blizzard.asString(positions[0]))
     }
+    return Pair(round, blizzard)
+}
+
+val startPos = Coord(1, 0)
+fun part2(input: String, stage: String) {
+    val blizzard = input.toState()
+    val endPos = blizzard.size + grid.Up
+
+    val there = findPath(startPos, endPos, blizzard)
+    printAnswer(there.first, if (stage == "problem") 274 else 18, "There")
+    val back = findPath(endPos, startPos, there.second)
+    printAnswer(back.first, if (stage == "problem") 294 else 23, "Back")
+    val thereAgain = findPath(startPos, endPos, back.second)
+    printAnswer(thereAgain.first, if (stage == "problem") 271 else 13, "There Again")
+
+    val want = if (stage == "problem") 274 + 294 + 271 else 18 + 23 + 13
+    printAnswer(there.first + back.first + thereAgain.first, want, "Part 1")
+}
+
+fun part1(input: String, stage: String) {
+    val blizzard = input.toState()
+    val endPos = blizzard.size + grid.Up
+    val rounds = findPath(startPos, endPos, blizzard)
 
     val want = if (stage == "problem") 274 else 18
-    printAnswer(round + 1, want, "Part 1")
+    printAnswer(rounds, want, "Part 1")
 }
 
 fun nextStates(current: Coord, blizzard: BlizzardState): List<Coord> {
     val next = mutableListOf<Coord>()
     val blizzardPositions = blizzard.bb.map { it.position }.toSet()
+    val endPos = blizzard.size + grid.Up
     fun inBounds(c: Coord): Boolean = c.x > 0 && c.y > 0 && c.x <= blizzard.size.x && c.y <= blizzard.size.y
     listOf(grid.Right, grid.Up, grid.Nothing, grid.Left, grid.Down).forEach { offset ->
         val n = current + offset
-        if ((inBounds(n) || n == startPos) && n !in blizzardPositions) {
+        if ((inBounds(n) || n == startPos || n == endPos) && n !in blizzardPositions) {
             next.add(n)
         }
     }
