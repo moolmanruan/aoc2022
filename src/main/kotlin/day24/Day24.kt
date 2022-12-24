@@ -78,6 +78,88 @@ data class BlizzardState(
     }
 }
 
+fun BlizzardState.asStringImage(me: Coord? = null): String {
+    val blockSize = 5
+    val g = grid.NewGrid((size.x + 2) * blockSize, (size.y + 2) * blockSize, "e").toMutableGrid()
+    val xm = size.x + 1
+    val ym = size.y + 1
+    fun drawWall(x: Int, y: Int) {
+        (x * blockSize until (x + 1) * blockSize).forEach { x ->
+            (y * blockSize until (y + 1) * blockSize).forEach { y ->
+                g.set(x, y, "w")
+            }
+        }
+    }
+    fun drawBlizzard(x: Int, y: Int, d: Direction) {
+        val xs = (x * blockSize) + 2
+        val ys = (y * blockSize) + 2
+        (xs - 1..xs + 1).forEach { x ->
+            (ys - 1..ys + 1).forEach { y ->
+                g.set(x, y, "x")
+            }
+        }
+        when (d) {
+            Direction.UP -> {
+                (xs - 1..xs + 1).forEach { x ->
+                    g.set(x, ys - 2, "u")
+                }
+            }
+            Direction.DOWN -> {
+                (xs - 1..xs + 1).forEach { x ->
+                    g.set(x, ys + 2, "d")
+                }
+            }
+            Direction.RIGHT -> {
+                (ys - 1..ys + 1).forEach { y ->
+                    g.set(xs + 2, y, "r")
+                }
+            }
+            Direction.LEFT -> {
+                (ys - 1..ys + 1).forEach { y ->
+                    g.set(xs - 2, y, "l")
+                }
+            }
+        }
+    }
+    fun drawParty(x: Int, y: Int) {
+        val xs = (x * blockSize) + 2
+        val ys = (y * blockSize) + 2
+        (xs - 1..xs + 1).forEach { x ->
+            (ys - 1..ys + 1).forEach { y ->
+                g.set(x, y, "o")
+            }
+        }
+    }
+
+    val startPos = Coord(1, 0)
+    val endPos = size + grid.Up
+    for (x in 0..xm) {
+        for (y in 0..ym) {
+            val c = Coord(x, y)
+            if ((y == 0 || x == 0 || y == ym || x == xm) &&
+                c != startPos &&
+                c != endPos
+            ) {
+                drawWall(x, y)
+            }
+            if (me == c) {
+                drawParty(x, y)
+            }
+
+            bb.filter { it.position == c }.forEach {
+                drawBlizzard(x, y, it.direction)
+            }
+        }
+    }
+    // Make the cells comma-separated
+    g.forEachCell { coord, s ->
+        if (coord.x < g.width() - 1) {
+            g.set(coord, "$s,")
+        }
+    }
+    return g.toString()
+}
+
 fun String.toState(): BlizzardState {
     val lines = this.split("\n")
     val blizzard = mutableListOf<Blizzard>()
@@ -101,28 +183,36 @@ fun String.toState(): BlizzardState {
 }
 
 fun run(input: String, stage: String) {
-//    part1(input, stage)
+    part1(input, stage)
     part2(input, stage)
 }
 
-fun findPath(start: Coord, destination: Coord, startState: BlizzardState): Pair<Int, BlizzardState> {
+data class Position(val current: Coord, val prev: Position?)
+
+data class Result(val rounds: Int, val position: Position, val blizzard: BlizzardState)
+fun findPath(start: Coord, destination: Coord, startState: BlizzardState): Result {
     var round = 0
-    var positions = listOf(start)
+    val startPos = Position(start, null)
+    var positions = listOf(startPos)
     var blizzard = startState
 
     while (true) {
         round++
         blizzard = blizzard.next()
-        val newPositions = mutableSetOf<Coord>()
+
+        val newPositions = mutableMapOf<Coord, Position>()
         positions.forEach { p ->
-            newPositions.addAll(nextStates(p, blizzard))
+            nextStates(p.current, blizzard).map { c ->
+                if (c !in newPositions) {
+                    newPositions[c] = Position(c, p)
+                }
+            }
         }
         if (destination in newPositions) {
-            break
+            return Result(round, newPositions[destination]!!, blizzard)
         }
-        positions = newPositions.sortedBy { it.l1Distance(blizzard.size) }
+        positions = newPositions.map { (_, v) -> v }.sortedBy { it.current.l1Distance(blizzard.size) }
     }
-    return Pair(round, blizzard)
 }
 
 val startPos = Coord(1, 0)
@@ -131,23 +221,55 @@ fun part2(input: String, stage: String) {
     val endPos = blizzard.size + grid.Up
 
     val there = findPath(startPos, endPos, blizzard)
-    printAnswer(there.first, if (stage == "problem") 274 else 18, "There")
-    val back = findPath(endPos, startPos, there.second)
-    printAnswer(back.first, if (stage == "problem") 294 else 23, "Back")
-    val thereAgain = findPath(startPos, endPos, back.second)
-    printAnswer(thereAgain.first, if (stage == "problem") 271 else 13, "There Again")
+    printAnswer(there.rounds, if (stage == "problem") 274 else 18, "There")
+    val back = findPath(endPos, startPos, there.blizzard)
+    printAnswer(back.rounds, if (stage == "problem") 294 else 23, "Back")
+    val thereAgain = findPath(startPos, endPos, back.blizzard)
+    printAnswer(thereAgain.rounds, if (stage == "problem") 271 else 13, "There Again")
 
     val want = if (stage == "problem") 274 + 294 + 271 else 18 + 23 + 13
-    printAnswer(there.first + back.first + thereAgain.first, want, "Part 1")
+    printAnswer(there.rounds + back.rounds + thereAgain.rounds, want, "Part 1")
 }
 
 fun part1(input: String, stage: String) {
     val blizzard = input.toState()
     val endPos = blizzard.size + grid.Up
-    val rounds = findPath(startPos, endPos, blizzard)
+    val result = findPath(startPos, endPos, blizzard)
+
+    // Output gif text file
+//    val f = File("/Users/ruan/aoc2022/src/main/kotlin/day24/output.txt")
+//    f.writeText(
+//        """
+//        delay:10
+//        scale:1
+//        ---
+//        w:C4,A4,84,ff
+//        e:ff,ff,ff,ff
+//        o:00,00,00,ff
+//        x:8E,F0,EF,ff
+//        r:8E,A7,F0,ff
+//        l:8E,A7,F0,ff
+//        u:8E,A7,F0,ff
+//        d:8E,A7,F0,ff
+//        ---
+//        """.trimIndent()
+//    )
+//    var b = input.toState()
+//    val path = mutableListOf<Coord>()
+//    var p: Position? = result.position
+//    while (p != null) {
+//        path.add(p.current)
+//        p = p.prev
+//    }
+//    path.reverse()
+//    f.appendText("-\n${b.asStringImage(path[0])}")
+//    repeat(result.rounds) {
+//        b = b.next()
+//        f.appendText("-\n${b.asStringImage(path[it + 1])}")
+//    }
 
     val want = if (stage == "problem") 274 else 18
-    printAnswer(rounds, want, "Part 1")
+    printAnswer(result.rounds, want, "Part 1")
 }
 
 fun nextStates(current: Coord, blizzard: BlizzardState): List<Coord> {

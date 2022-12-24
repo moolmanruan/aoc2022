@@ -165,4 +165,102 @@ class Day24Test {
             nextStates(Coord(2, 2), bs)
         )
     }
+
+    @Test
+    fun asStringImage() {
+        var bs = """
+            #.##
+            #>v#
+            #^<#
+            ##.#
+        """.trimIndent().toState()
+//        assertEquals(
+//            """
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,x,x,x,r,e,x,x,x,e,w,w,w,w,w
+//            w,w,w,w,w,e,x,x,x,r,e,x,x,x,e,w,w,w,w,w
+//            w,w,w,w,w,e,x,x,x,r,e,x,x,x,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,d,d,d,e,w,w,w,w,w
+//            w,w,w,w,w,e,u,u,u,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,x,x,x,e,l,x,x,x,e,w,w,w,w,w
+//            w,w,w,w,w,e,x,x,x,e,l,x,x,x,e,w,w,w,w,w
+//            w,w,w,w,w,e,x,x,x,e,l,x,x,x,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            """.trimIndent(),
+//            bs.asStringImage()
+//        )
+//        bs = """
+//            ####
+//            #.<#
+//            #^.#
+//            ####
+//        """.trimIndent().toState()
+//        assertEquals(
+//            """
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+//            w,w,w,w,w,e,u,u,u,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,l,x,x,x,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,l,x,x,x,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,l,x,x,x,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+//            """.trimIndent(),
+//            bs.next().asStringImage()
+//        )
+
+        bs = """
+            ####
+            #..#
+            #..#
+            ####
+        """.trimIndent().toState()
+        assertEquals(
+            """
+            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,w,w,w,w,w,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,o,o,o,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,o,o,o,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,o,o,o,e,w,w,w,w,w
+            w,w,w,w,w,e,e,e,e,e,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+            w,w,w,w,w,w,w,w,w,w,e,e,e,e,e,w,w,w,w,w
+            """.trimIndent(),
+            bs.asStringImage(Coord(2, 2))
+        )
+    }
 }
