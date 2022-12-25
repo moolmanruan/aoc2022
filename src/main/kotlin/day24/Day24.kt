@@ -183,8 +183,13 @@ fun String.toState(): BlizzardState {
 }
 
 fun run(input: String, stage: String) {
+    val before1 = System.currentTimeMillis()
     part1(input, stage)
+    println("Part 1 took: ${(System.currentTimeMillis() - before1) / 1000.0}")
+    val before2 = System.currentTimeMillis()
     part2(input, stage)
+    println("Part 2 took: ${(System.currentTimeMillis() - before2) / 1000.0}")
+    println("Together took: ${(System.currentTimeMillis() - before1) / 1000.0}")
 }
 
 data class Position(val current: Coord, val prev: Position?)
